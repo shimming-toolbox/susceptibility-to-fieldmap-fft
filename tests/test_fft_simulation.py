@@ -1,4 +1,4 @@
-from fft_simulation.fft_simulation import is_nifti, load_sus_dist, save_to_nifti
+from fft_simulation.fft_simulation import is_nifti, load_sus_dist, save_to_nifti, compute_bz
 import numpy as np
 import nibabel as nib
 import os
@@ -21,6 +21,19 @@ def test_load_sus_dist(tmpdir):
 
     assert np.array_equal(loaded_data, data) 
     assert np.array_equal(img_res, [1,1,1])
+
+def test_compute_bz_zero_susceptibility():
+    zero_susceptibility = np.zeros((64,64,64))
+    result = compute_bz(zero_susceptibility)
+
+    assert np.array_equal(result, zero_susceptibility), "Field variation computation failed for zero susceptiility"
+
+def test_compute_bz_uniform_susceptibility():
+    uniform_susceptibility = np.ones((64,64,64))
+    result = compute_bz(uniform_susceptibility)
+    reference_point = result[0,0,0]
+
+    assert np.all(result == reference_point), "Field variation computation failed for uniform susceptiility"
 
 def test_save_to_nifti(tmpdir):
     data = np.random.rand(32, 32, 32)
