@@ -8,19 +8,19 @@ def test_is_nifti():
     good_filepath = 'example.nii'
     wrong_filepath = 'example.txt'
 
-    assert is_nifti(good_filepath)
-    assert is_nifti(wrong_filepath) is False
+    assert is_nifti(good_filepath), "is_nifti failed for a correct filepath"
+    assert is_nifti(wrong_filepath) is False, "is_nifti failed for a wrong filepath"
     
 def test_load_sus_dist(tmpdir):
     data = np.random.rand(32, 32, 32)
     affine = np.eye(4)
-    nifti_img = nib.Nifti1Image(data, affine)
+    nifti_imagw = nib.Nifti1Image(data, affine)
     filepath = os.path.join(tmpdir, 'output_image.nii')
-    nib.save(nifti_img, filepath)
-    loaded_data, img_res = load_sus_dist(filepath)
+    nib.save(nifti_imagw, filepath)
+    loaded_data, image_resolution = load_sus_dist(filepath)
 
-    assert np.array_equal(loaded_data, data) 
-    assert np.array_equal(img_res, [1,1,1])
+    assert np.array_equal(loaded_data, data), "load_sus_dist failed to retrive the image data correctly"
+    assert np.array_equal(image_resolution, [1,1,1]), "load_sus_dist failed to retrive the image resolution correctly"
 
 def test_compute_bz_zero_susceptibility():
     zero_susceptibility = np.zeros((64,64,64))
@@ -37,17 +37,17 @@ def test_compute_bz_uniform_susceptibility():
 
 def test_save_to_nifti(tmpdir):
     data = np.random.rand(32, 32, 32)
-    img_res = np.array([1,1,1])
+    image_resolution = np.array([1,1,1])
     filepath = os.path.join(tmpdir, 'output_image.nii')
-    save_to_nifti(data, img_res, filepath)
+    save_to_nifti(data, image_resolution, filepath)
 
     loaded_nii = nib.load(filepath)
     header = loaded_nii.header
     loaded_data = loaded_nii.get_fdata()
-    loaded_img_res = header.get_zooms()
+    loaded_image_resolution = header.get_zooms()
 
-    assert np.array_equal(data, loaded_data)
-    assert np.array_equal(img_res, loaded_img_res)
+    assert np.array_equal(data, loaded_data), "save_to_nifti failed to save the image data correctly"
+    assert np.array_equal(image_resolution, loaded_image_resolution), "save_to_nifti failed to save the image resolution correctly"
 
 
 
