@@ -75,6 +75,7 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
         kernel[0,0,0] = 1/3
 
     FFT_chi = np.fft.fftn(susceptibility_distribution, new_dimensions)
+    FFT_chi[0,0,0] = FFT_chi[0,0,0] + np.prod(new_dimensions)*susceptibility_distribution[0,0,0]
     Bz_fft = kernel*FFT_chi
 
     # retrive the inital FOV
