@@ -116,15 +116,15 @@ def main(args):
 
         h = axes[0,0].imshow(sus_dist[matrix[0] // 2, :, :], origin='lower')
         axes[0,0].set_title('Slice along y-z plane')
-        plt.colorbar(h)
+        plt.colorbar(h, label='Susceptibility [ppm]')
 
         h = axes[0,1].imshow(sus_dist[:, matrix[0] // 2, :], origin='lower')
         axes[0,1].set_title('Slice along x-z plane')
-        plt.colorbar(h)
+        plt.colorbar(h, label='Susceptibility [ppm]')
 
         h = axes[0,2].imshow(sus_dist[:, :, matrix[0] // 2], origin='lower')
         axes[0,2].set_title('Slice along y-z plane')
-        plt.colorbar(h)
+        plt.colorbar(h, label='Susceptibility [ppm]')
 
         # plot section of the b0 field variation
 
@@ -133,15 +133,15 @@ def main(args):
 
         h = axes[1,0].imshow(calculated_Bz[63, :, :],vmin=vmin, vmax=vmax, origin='lower')
         axes[0,0].set_title('Y-Z plane')
-        plt.colorbar(h)
+        plt.colorbar(h, label='Field variation [ppm]')
 
         h = axes[1,1].imshow(calculated_Bz[:, 63, :],vmin=vmin, vmax=vmax, origin='lower')
         axes[0,1].set_title('X-Z plane')
-        plt.colorbar(h)
+        plt.colorbar(h, label='Field variation [ppm]')
 
         h = axes[1,2].imshow(calculated_Bz[:, :, 63],vmin=vmin, vmax=vmax, origin='lower')
         axes[0,2].set_title('X-Y plane')
-        plt.colorbar(h)
+        plt.colorbar(h, label='Field variation [ppm]')
         plt.tight_layout()
         plt.show()
 
@@ -188,15 +188,15 @@ def main(args):
 
         h = axes[0,0].imshow(sus_dist[matrix[0] // 2, :, :], origin='lower')
         axes[0,0].set_title('Slice along y-z plane')
-        plt.colorbar(h)
+        plt.colorbar(h, label='Susceptibility [ppm]')
 
         h = axes[0,1].imshow(sus_dist[:, matrix[0] // 2, :], origin='lower')
         axes[0,1].set_title('Slice along x-z plane')
-        plt.colorbar(h)
+        plt.colorbar(h, label='Susceptibility [ppm]')
 
         h = axes[0,2].imshow(sus_dist[:, :, matrix[0] // 2], origin='lower')
         axes[0,2].set_title('Slice along y-z plane')
-        plt.colorbar(h)
+        plt.colorbar(h, label='Susceptibility [ppm]')
 
         # plot section of the b0 field variation
 
@@ -205,15 +205,15 @@ def main(args):
 
         h = axes[1,0].imshow(calculated_Bz[63, :, :],vmin=vmin, vmax=vmax, origin='lower')
         axes[0,0].set_title('Y-Z plane')
-        plt.colorbar(h)
+        plt.colorbar(h, label='Field variation [ppm]')
 
         h = axes[1,1].imshow(calculated_Bz[:, 63, :],vmin=vmin, vmax=vmax, origin='lower')
         axes[0,1].set_title('X-Z plane')
-        plt.colorbar(h)
+        plt.colorbar(h, label='Field variation [ppm]')
 
         h = axes[1,2].imshow(calculated_Bz[:, :, 63],vmin=vmin, vmax=vmax, origin='lower')
         axes[0,2].set_title('X-Y plane')
-        plt.colorbar(h)
+        plt.colorbar(h, label='Field variation [ppm]')
         plt.tight_layout()
         plt.show()
 
@@ -257,7 +257,7 @@ if __name__ == "__main__":
     parser.add_argument("-b",
                         dest="buffer",
                         type=int,
-                        required=True,
+                        default= 2,
                         help="Buffer value for zero-padding.")
     
     args = parser.parse_args()
