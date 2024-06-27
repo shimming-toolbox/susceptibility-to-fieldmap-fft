@@ -73,11 +73,63 @@ In order to simulate this scenario, we can assume that $\tilde B_{dz} (\mathbf{k
 $$ \tilde B_{dz-demod} (\mathbf{k}) =  \Delta \tilde \chi (\mathbf{k}) \cdot B_0 \bigg (\frac{1}{3} - \frac{k_z^2}{|\mathbf{k}|^2} \bigg) $$
 
 
-These final equations are the ones used in **fft_simulation**, which calculates the magnetic field offset produced by a susceptibility distribution subject to a uniform external magnetic field $B_0$ (oriented along the z-axis).
+These final equations are the ones used in the function **compute_bz**, which calculates the magnetic field offset produced by a susceptibility distribution subject to a uniform external magnetic field $B_0$ (oriented along the z-axis).
 
-## Usage 
+## Installation 
 
-TODO
+First, clone the repository
+
+```
+git clone https://github.com/shimming-toolbox/susceptibility-to-fieldmap-fft.git
+```
+
+Navigate to the project directory
+
+```
+cd susceptibility-to-fieldmap-fft
+```
+
+Install the requirements
+
+```
+pip install -r requirements.txt
+```
+
+## Usage
+To execute the scripts, you need to naviagte into the fft_simulation folder.
+
+### Analytical cases
+
+The _analytical_case.py_ script allows for comparaison between simulated and analytical results for a spherical and cylindrical phantom. 
+
+**Arguments** 
+- -t, type : 'spherical' or 'cylindrical'
+- -b, buffer (optional, default=2): Buffer value for zero-padding around the phantom
+
+**Return** 
+Plots to visialize the results
+
+Example:
+```
+python analytical_cases.py -t "spherical"
+```
+
+
+### fft_simulation
+
+The _fft_simulation.py_ script allow computation of a $B_0$ fieldmap based on a susceptibility distribution given as an input.
+
+**Arguments** 
+- -i, input : path to the susceptibility distribution (NIfTI file)
+- -o, output : path for the fieldmap (NIfTI file)
+
+**Return** 
+The calculated fieldmap at the specified path.
+
+Example:
+```
+python fft_simulation.py -i \your\sus_dist\path.nii -o \yout\fieldmap\path.nii
+```
 
 ## References :
 
