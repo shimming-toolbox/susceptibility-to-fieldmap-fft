@@ -1,6 +1,6 @@
 import numpy as np
 import nibabel as nib
-import argparse
+import click
 
 def is_nifti(filepath):
     """
@@ -12,7 +12,7 @@ def is_nifti(filepath):
     Returns:
         bool: True if the file is a NIfTI file, False otherwise.
     """
-    if filepath[-4:] == '.nii':
+    if filepath[-4:] == '.nii' or filepath[-7:] == '.nii.gz':
         return True
     else:
         return False
@@ -100,28 +100,40 @@ def save_to_nifti(data, image_resolution, output_path):
     nifti_image = nib.Nifti1Image(data, affine)
     nib.save(nifti_image, output_path)
 
-def main():
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i",
-                        dest="input_file",
-                        type=str,
-                        required=True,
-                        help="Path to the NIfTI file input.")
+
+@click.command(help="Compute the magnetic field Bz in ppm from a susceptibility distribution in NIfTI format.")
+@click.argument('input_file', required=True, type=click.Path(exists=True))
+@click.argument('output_file', required=True, type=click.Path())
+def main(input_file, output_file):
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("-i",
+    #                     dest="input_file",
+    #                     type=str,
+    #                     required=True,
+    #                     help="Path to the NIfTI file input.")
     
-    parser.add_argument("-o",
-                        dest="output_file",
-                        type=str,
-                        required=True,
-                        help="Path to the NIfTI file ouput.")
-    args = parser.parse_args()
+    # parser.add_argument("-o",
+    #                     dest="output_file",
+    #                     type=str,
+    #                     required=True,
+    #                     help="Path to the NIfTI file ouput.")
+    # args = parser.parse_args()
 
-    if is_nifti(args.input_file):
-        sus_dist, img_res = load_sus_dist(args.input_file)
+    """
+    This script processes a NIfTI file by performing a simple operation on the voxel data 
+        and saves the modified data to a new NIfTI file.
+
+        INPUT_FILE: Path to the input susceptibility distribution in NIfTI format.
+
+        OUTPUT_FILE: Path to the output fieldmap where the data will be saved in NIfTI format.
+    """
+    if is_nifti(input_file):
+        sus_dist, img_res = load_sus_dist(input_file)
         fieldmap = compute_bz(sus_dist, img_res)
-        save_to_nifti(fieldmap, img_res, args.output_file)
+        save_to_nifti(fieldmap, img_res, output_file)
     else:
-        print("The input file is not NIfTI.")
+        print("The input file must be NIfTI.")
 
 
 if __name__ == "__main__":

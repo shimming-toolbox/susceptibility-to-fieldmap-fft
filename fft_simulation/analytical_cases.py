@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.ndimage import rotate
 import argparse
+import click
 
 class Spherical:
     def __init__(self, matrix, image_res, R, sus_diff):
@@ -96,18 +97,18 @@ class Cylindrical:
         return Bz_analytical_x, Bz_analytical_y
     
 
-def main(args):
+def main(geometry_type, buffer):
     matrix = np.array([128,128,128])
     image_res = np.array([1,1,1]) # mm
     R = 15 # mm
     sus_diff = 9 # ppm
 
-    if args.type == 'spherical':
+    if geometry_type == 'spherical':
         # create the susceptibility geometry
         sphere = Spherical(matrix, image_res, R, sus_diff)
         sus_dist = sphere.volume()
         # compute Bz variation
-        calculated_Bz = compute_bz(sus_dist, image_res, args.buffer)
+        calculated_Bz = compute_bz(sus_dist, image_res, buffer)
         # analytical solution
         Bz_analytical = sphere.analyticial_sol()
 
@@ -179,7 +180,7 @@ def main(args):
         sus_dist = cylinder.volume()
 
         # compute Bz variation
-        calculated_Bz = compute_bz(sus_dist, image_res, args.buffer)
+        calculated_Bz = compute_bz(sus_dist, image_res, buffer)
 
         Bz_analytical_x, Bz_analytical_y = cylinder.analytical_sol()
 
@@ -243,22 +244,14 @@ def main(args):
         plt.tight_layout()
         plt.show()
 
-
+@click.command(help="Compare the analytical solution to the simulated solution for a spherical or cylindrical geometry.")
+@click.option('-t', '--geometry-type',required=True, 
+              type=click.Choice(['spherical', 'cylindrical']), 
+              help='Type of geometry for the simulation')
+@click.option('-b', '--buffer', default=2, 
+              help='Buffer value for zero-padding.')
+def cli(geometry_type, buffer):
+    main(geometry_type, buffer)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-t",
-                        dest="type",
-                        type=str,
-                        required=True,
-                        choices=['spherical', 'cylindrical'],
-                        help="Type of geometry for the simulation")
-    
-    parser.add_argument("-b",
-                        dest="buffer",
-                        type=int,
-                        default= 2,
-                        help="Buffer value for zero-padding.")
-    
-    args = parser.parse_args()
-    main(args)
+    cli()
