@@ -5,10 +5,12 @@ import os
 
 
 def test_is_nifti():
-    good_filepath = 'example.nii'
+    good_filepath1 = 'example.nii'
+    good_filepath2 = 'example.nii.gz'
     wrong_filepath = 'example.txt'
 
-    assert is_nifti(good_filepath), "is_nifti failed for a correct filepath"
+    assert is_nifti(good_filepath1), "is_nifti failed for a .nii file"
+    assert is_nifti(good_filepath2), "is_nifti failed for a .nii.gz file"
     assert is_nifti(wrong_filepath) is False, "is_nifti failed for a wrong filepath"
     
 def test_load_sus_dist(tmpdir):
