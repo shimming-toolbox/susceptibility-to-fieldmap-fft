@@ -135,7 +135,7 @@ Example:
 python fft_simulation.py "\your\sus_dist\path.nii" "\yout\fieldmap\path.nii"
 ```
 
-## References :
+## References
 
 J.P. MARQUES, R. BOWTELL Concepts in Magnetic Resonance Part B (Magnetic Resonance Engineering), Vol. 25B(1) 65-78 (2005)
 
