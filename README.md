@@ -1,9 +1,13 @@
 # susceptibility-to-fieldmap-fft
 
-The theory section is taken from [Fourier-based-field-estimation](https://github.com/evaalonsoortiz/Fourier-based-field-estimation).
-
+# Table of contents
+1. [Theory](#theory)
+2. [Installation](#installation)
+3. [Usage](#usage)
+4. [References](#references)
 
 ## Theory 
+The theory section is taken from [Fourier-based-field-estimation](https://github.com/evaalonsoortiz/Fourier-based-field-estimation).
 
 The "susceptibility-to-fieldmap-fft" code allows one to estimate the magnetic field perturbation that arises when an object is placed within a magnetic field.
 
@@ -131,7 +135,7 @@ Example:
 python fft_simulation.py "\your\sus_dist\path.nii" "\yout\fieldmap\path.nii"
 ```
 
-## References :
+## References
 
 J.P. MARQUES, R. BOWTELL Concepts in Magnetic Resonance Part B (Magnetic Resonance Engineering), Vol. 25B(1) 65-78 (2005)
 
