@@ -1,9 +1,13 @@
 # susceptibility-to-fieldmap-fft
 
-The theory section is taken from [Fourier-based-field-estimation](https://github.com/evaalonsoortiz/Fourier-based-field-estimation).
-
+# Table of contents
+1. [Theory](#theory)
+2. [Installation](#installation)
+3. [Usage](#usage)
+4. [References](#references)
 
 ## Theory 
+The theory section is taken from [Fourier-based-field-estimation](https://github.com/evaalonsoortiz/Fourier-based-field-estimation).
 
 The "susceptibility-to-fieldmap-fft" code allows one to estimate the magnetic field perturbation that arises when an object is placed within a magnetic field.
 
