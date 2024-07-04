@@ -120,15 +120,15 @@ python analytical_cases.py -t "spherical"
 The _fft_simulation.py_ script allow computation of a $B_0$ fieldmap based on a susceptibility distribution given as an input.
 
 **Arguments** 
-- -i, input : path to the susceptibility distribution (NIfTI file)
-- -o, output : path for the fieldmap (NIfTI file)
+- -input_file : path to the susceptibility distribution (NIfTI file)
+- -output_file : path for the fieldmap (NIfTI file)
 
 **Return** 
 The calculated fieldmap at the specified path.
 
 Example:
 ```
-python fft_simulation.py -i \your\sus_dist\path.nii -o \yout\fieldmap\path.nii
+python fft_simulation.py "\your\sus_dist\path.nii" "\yout\fieldmap\path.nii"
 ```
 
 ## References :
