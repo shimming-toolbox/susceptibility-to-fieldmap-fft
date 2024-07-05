@@ -102,31 +102,19 @@ def save_to_nifti(data, image_resolution, output_path):
 
 
 
-@click.command(help="Compute the magnetic field Bz in ppm from a susceptibility distribution in NIfTI format.")
+@click.command(help="Compute the magnetic field variation in ppm from a susceptibility distribution in NIfTI format.")
 @click.argument('input_file', required=True, type=click.Path(exists=True))
 @click.argument('output_file', required=True, type=click.Path())
 def main(input_file, output_file):
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("-i",
-    #                     dest="input_file",
-    #                     type=str,
-    #                     required=True,
-    #                     help="Path to the NIfTI file input.")
-    
-    # parser.add_argument("-o",
-    #                     dest="output_file",
-    #                     type=str,
-    #                     required=True,
-    #                     help="Path to the NIfTI file ouput.")
-    # args = parser.parse_args()
-
     """
-    This script processes a NIfTI file by performing a simple operation on the voxel data 
-        and saves the modified data to a new NIfTI file.
+    Main procedure for performing the simulation.
 
-        INPUT_FILE: Path to the input susceptibility distribution in NIfTI format.
+    Args:
+        input_file (str): Path to the susceptibility distribution in NIfTI format.
+        output_file (str): Path for the computed fieldmap in NIfTI format.
 
-        OUTPUT_FILE: Path to the output fieldmap where the data will be saved in NIfTI format.
+    Returns:
+        None
     """
     if is_nifti(input_file):
         sus_dist, img_res = load_sus_dist(input_file)
@@ -134,9 +122,5 @@ def main(input_file, output_file):
         save_to_nifti(fieldmap, img_res, output_file)
     else:
         print("The input file must be NIfTI.")
-
-
-if __name__ == "__main__":
-    main()
 
     

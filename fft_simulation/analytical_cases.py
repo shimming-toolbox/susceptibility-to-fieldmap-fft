@@ -1,11 +1,26 @@
-from fft_simulation import compute_bz
+from fft_simulation.fft_simulation import compute_bz
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.ndimage import rotate
-import argparse
 import click
 
 class Spherical:
+    """
+    Represents a spherical object in 3D space.
+
+    Attributes:
+    - matrix (ndarray): The dimensions of the matrix representing the object (i.e. [128, 128, 128]).
+    - image_res (ndarray): The resolution of the image in mm (i.e. [1, 1, 1] mm).
+    - R (int): The radius of the sphere in mm.
+    - sus_diff (float): The susceptibility difference of the sphere 
+                        (sus_diff = susceptibility_in_the_sphere - susceptibility_outside).
+
+    Methods:
+    - mask(): Generates a mask representing the spherical object.
+    - volume(): Create a volume of the sphere with the corresponding suceptibility value.
+    - analyticial_sol(): Calculates the analytical solution for the magnetic field inside and outside the sphere.
+    """
+
     def __init__(self, matrix, image_res, R, sus_diff):
         self.matrix = matrix
         self.image_res = image_res
@@ -13,6 +28,12 @@ class Spherical:
         self.sus_diff = sus_diff
 
     def mask(self):
+        """
+        Generates a mask representing the spherical object.
+
+        Returns:
+        - mask (ndarray): A boolean array representing the mask.
+        """
         [x, y, z] = np.meshgrid(np.linspace(-(self.matrix[0]-1)/2, (self.matrix[0]-1)/2, self.matrix[0]),
                                 np.linspace(-(self.matrix[1]-1)/2, (self.matrix[1]-1)/2, self.matrix[1]),
                                 np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]))
@@ -22,9 +43,21 @@ class Spherical:
         return r**2 < self.R**2
     
     def volume(self):
+        """
+        Create a volume of the sphere with the corresponding suceptibility value.
+
+        Returns:
+        - volume (ndarray): A 3D array representing the distribution of suceptibility.
+        """
         return np.where(self.mask() == True, self.sus_diff, 0)
     
     def analyticial_sol(self):
+        """
+        Calculates the analytical solution for the magnetic field inside and outside the sphere.
+
+        Returns:
+        - Bz_analytical (ndarray): A 3D array representing the analytical solution for the magnetic field.
+        """
         mask = self.mask()
 
         [x, y, z] = np.meshgrid(np.linspace(-(self.matrix[0]-1)/2, (self.matrix[0]-1)/2, self.matrix[0]),
@@ -47,6 +80,23 @@ class Spherical:
         
 
 class Cylindrical:
+    """
+    Represents a cylindrical object in 3D space.
+
+    Parameters:
+    - matrix (ndarray): The dimensions of the matrix representing the object (i.e. [128, 128, 128]).
+    - image_res (ndarray): The resolution of the image in mm (i.e. [1, 1, 1] mm).
+    - R (int): The radius of the cylinder in mm.
+    - sus_diff (float): The susceptibility difference of the cylinder 
+                        (sus_diff = susceptibility_in_the_cylinder - susceptibility_outside).
+    - theta (float, optional): The rotation angle about the y-axis. Default is pi/2.
+
+    Methods:
+    - mask(): Generates a mask representing the cylinder.
+    - volume(): Create a volume of the sphere with the corresponding suceptibility value.
+    - analytical_sol(): Calculates the analytical solution for the magnetic field inside and outside the cylinder.
+    """
+
     def __init__(self, matrix, image_res, R, sus_diff, theta=np.pi/2):
         self.matrix = matrix
         self.image_res = image_res
@@ -55,6 +105,12 @@ class Cylindrical:
         self.theta = theta # rotation angle about the y-axis
 
     def mask(self):
+        """
+        Generates a mask representing the cylinder.
+
+        Returns:
+        - mask (ndarray): The mask representing the cylinder.
+        """
         [x, y, z] = np.meshgrid(np.linspace(-(self.matrix[0]-1)/2, (self.matrix[0]-1)/2, self.matrix[0]),
                                 np.linspace(-(self.matrix[1]-1)/2, (self.matrix[1]-1)/2, self.matrix[1]),
                                 np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]))
@@ -67,10 +123,22 @@ class Cylindrical:
         return rotate(mask, self.theta*180/np.pi, axes=(0, 2), reshape=False, order=1)
     
     def volume(self):
+        """
+        Create a volume of the sphere with the corresponding suceptibility value.
+
+        Returns:
+        - volume (ndarray): A 3D array representing the distribution of suceptibility.
+        """
         return np.where(self.mask() == True, self.sus_diff, 0)
     
-# TODO: For now the analytical solution is only correct for theta = 90
     def analytical_sol(self):
+        """
+        Calculates the analytical solution for the magnetic field inside and outside the cylinder.
+
+        Returns:
+        - Bz_analytical_x (ndarray): The analytical solution for the magnetic field along the x-axis.
+        - Bz_analytical_y (ndarray): The analytical solution for the magnetic field along the y-axis.
+        """
         phi_x = 0
         phi_y = np.pi/2
 
@@ -96,8 +164,34 @@ class Cylindrical:
 
         return Bz_analytical_x, Bz_analytical_y
     
-
+@click.command(help="Compare the analytical solution to the simulated solution for a spherical or cylindrical geometry.")
+@click.option('-t', '--geometry-type',required=True, 
+              type=click.Choice(['spherical', 'cylindrical']), 
+              help='Type of geometry for the simulation')
+@click.option('-b', '--buffer', default=2, 
+              help='Buffer value for zero-padding.')
 def main(geometry_type, buffer):
+    """
+    Main function for running the Fourier-based simulation with analytical cases.
+
+    Parameters:
+    - geometry_type (str): The type of geometry to simulate ('spherical' or 'cylindrical').
+    - buffer (float): The buffer size for the simulation.
+
+    Returns:
+    - None
+
+    This function performs the following steps:
+    1. Initializes the necessary variables and parameters.
+    2. Creates the susceptibility geometry based on the specified geometry type.
+    3. Computes the Bz variation using the computed susceptibility distribution and buffer size.
+    4. Plots sections of the susceptibility distribution and Bz field variation.
+    5. Plots the analytical solution and simulated results for the Bz field variation.
+
+    Note: The function uses a matrix size of [128, 128, 128], an image resolution of [1, 1, 1] mm, a radius of 15 mm
+            and a susceptibility difference of 9 ppm for the spherical and cylindrical geometries.
+    """
+
     matrix = np.array([128,128,128])
     image_res = np.array([1,1,1]) # mm
     R = 15 # mm
@@ -146,6 +240,7 @@ def main(geometry_type, buffer):
         plt.tight_layout()
         plt.show()
 
+        # comparaison with the analytical solution
 
         fig, axes = plt.subplots(1, 3, figsize=(10, 3), dpi=120)
 
@@ -218,6 +313,8 @@ def main(geometry_type, buffer):
         plt.tight_layout()
         plt.show()
 
+        # comparaison with the analytical solution
+
         fig, axes = plt.subplots(1, 3, figsize=(10, 3), dpi=120)
 
         axes[0].plot(np.linspace(-64,64, 128), Bz_analytical_x[:,63,63], label='Theory')
@@ -243,15 +340,3 @@ def main(geometry_type, buffer):
 
         plt.tight_layout()
         plt.show()
-
-@click.command(help="Compare the analytical solution to the simulated solution for a spherical or cylindrical geometry.")
-@click.option('-t', '--geometry-type',required=True, 
-              type=click.Choice(['spherical', 'cylindrical']), 
-              help='Type of geometry for the simulation')
-@click.option('-b', '--buffer', default=2, 
-              help='Buffer value for zero-padding.')
-def cli(geometry_type, buffer):
-    main(geometry_type, buffer)
-
-if __name__ == "__main__":
-    cli()
