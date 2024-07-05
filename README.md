@@ -89,20 +89,20 @@ Navigate to the project directory
 cd susceptibility-to-fieldmap-fft
 ```
 
-Install the requirements
+Install the package
 
 ```
-pip install -r requirements.txt
+pip install .
 ```
 
 ## Usage
-To execute the scripts, you need to naviagte into the fft_simulation folder.
+Once the package is install, the command can be run directly from the terminal. Here is the description of the two commands available.
 
-### Analytical cases
+### analytical_cases
 
-The _analytical_case.py_ script allows for comparaison between simulated and analytical results for a spherical and cylindrical phantom. 
+The _analytical_cases_ command allow for comparaison between simulated and analytical results for a spherical and cylindrical phantom. 
 
-**Arguments** 
+**Options** 
 - -t, type : 'spherical' or 'cylindrical'
 - -b, buffer (optional, default=2): Buffer value for zero-padding around the phantom
 
@@ -111,24 +111,24 @@ Plots to visialize the results
 
 Example:
 ```
-python analytical_cases.py -t "spherical"
+analytical_cases -t "spherical"
 ```
 
 
-### fft_simulation
+### compute_fieldmap
 
-The _fft_simulation.py_ script allow computation of a $B_0$ fieldmap based on a susceptibility distribution given as an input.
+The _compute_fieldmap_ command allow computation of a $B_0$ fieldmap based on a susceptibility distribution given as an input.
 
 **Arguments** 
-- -input_file : path to the susceptibility distribution (NIfTI file)
-- -output_file : path for the fieldmap (NIfTI file)
+- input_file : path to the susceptibility distribution (NIfTI file)
+- output_file : path for the fieldmap (NIfTI file)
 
 **Return** 
 The calculated fieldmap at the specified path.
 
 Example:
 ```
-python fft_simulation.py "\your\sus_dist\path.nii" "\yout\fieldmap\path.nii"
+compute_fieldmap "\your\sus_dist\path.nii" "\yout\fieldmap\path.nii"
 ```
 
 ## References :
