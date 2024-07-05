@@ -93,6 +93,12 @@ Navigate to the project directory
 cd susceptibility-to-fieldmap-fft
 ```
 
+(temporary) Go to the develop branch
+
+```
+git checkout develop
+```
+
 Install the package
 
 ```
