@@ -100,11 +100,11 @@ pip install .
 ```
 
 ## Usage
-Once the package is install, the command can be run directly from the terminal. Here is the description of the two commands available.
+Once the package is install, the commands can be run directly from the terminal. Here is the description of the two commands available.
 
 ### analytical_cases
 
-The _analytical_cases_ command allow for comparaison between simulated and analytical results for a spherical and cylindrical phantom. 
+The _analytical_cases_ command allows for comparaison between simulated and analytical results for a spherical and cylindrical phantom. 
 
 **Options** 
 - -t, type : 'spherical' or 'cylindrical'
@@ -121,7 +121,7 @@ analytical_cases -t "spherical"
 
 ### compute_fieldmap
 
-The _compute_fieldmap_ command allow computation of a $B_0$ fieldmap based on a susceptibility distribution given as an input.
+The _compute_fieldmap_ command allows computation of a $B_0$ fieldmap based on a susceptibility distribution given as an input.
 
 **Arguments** 
 - input_file : path to the susceptibility distribution (NIfTI file)
