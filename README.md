@@ -138,7 +138,7 @@ The calculated fieldmap at the specified path.
 
 Example:
 ```
-compute_fieldmap "\your\sus_dist\path.nii" "\yout\fieldmap\path.nii"
+compute_fieldmap "inpath/susceptibility_distribution.nii.gz" "outpath/fieldmap.nii.gz"
 ```
 
 ## References
