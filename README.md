@@ -106,7 +106,7 @@ pip install .
 ```
 
 ## Usage
-Once the package is install, the commands can be run directly from the terminal. Here is the description of the two commands available.
+Once the package is installed, the commands can be run directly from the terminal. Here is the description of the two commands available.
 
 ### analytical_cases
 
