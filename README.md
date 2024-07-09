@@ -93,6 +93,12 @@ Navigate to the project directory
 cd susceptibility-to-fieldmap-fft
 ```
 
+(temporary) Go to the develop branch
+
+```
+git checkout develop
+```
+
 Install the package
 
 ```
@@ -100,14 +106,14 @@ pip install .
 ```
 
 ## Usage
-Once the package is install, the commands can be run directly from the terminal. Here is the description of the two commands available.
+Once the package is installed, the commands can be run directly from the terminal. Here is the description of the two commands available.
 
 ### analytical_cases
 
 The _analytical_cases_ command allows for comparaison between simulated and analytical results for a spherical and cylindrical phantom. 
 
 **Options** 
-- -t, type : 'spherical' or 'cylindrical'
+- -t, geometry type : 'spherical' or 'cylindrical'
 - -b, buffer (optional, default=2): Buffer value for zero-padding around the phantom
 
 **Return** 
@@ -132,7 +138,7 @@ The calculated fieldmap at the specified path.
 
 Example:
 ```
-compute_fieldmap "\your\sus_dist\path.nii" "\yout\fieldmap\path.nii"
+compute_fieldmap "inpath/susceptibility_distribution.nii.gz" "outpath/fieldmap.nii.gz"
 ```
 
 ## References
