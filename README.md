@@ -113,7 +113,7 @@ Once the package is installed, the commands can be run directly from the termina
 The _analytical_cases_ command allows for comparaison between simulated and analytical results for a spherical and cylindrical phantom. 
 
 **Options** 
-- -t, type : 'spherical' or 'cylindrical'
+- -t, geometry type : 'spherical' or 'cylindrical'
 - -b, buffer (optional, default=2): Buffer value for zero-padding around the phantom
 
 **Return** 
