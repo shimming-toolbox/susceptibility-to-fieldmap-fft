@@ -81,29 +81,33 @@ These final equations are the ones used in the function **compute_bz**, which ca
 
 ## Installation 
 
-First, clone the repository
+- Clone the repository
 
 ```
 git clone https://github.com/shimming-toolbox/susceptibility-to-fieldmap-fft.git
-```
-
-Navigate to the project directory
-
-```
 cd susceptibility-to-fieldmap-fft
 ```
 
-(temporary) Go to the develop branch
+- Create a virtual environnement 
+
+```
+conda create --name <name of your environement> python=3.9
+conda activate <name of your environment>
+```
+
+- Go to the develop branch (temporary)
 
 ```
 git checkout develop
 ```
 
-Install the package
+- Install the package
 
 ```
 pip install .
 ```
+
+You will need to ```conda activate <name of your environment>``` each time you want to use the package.
 
 ## Usage
 Once the package is installed, the commands can be run directly from the terminal. Here is the description of the two commands available.
