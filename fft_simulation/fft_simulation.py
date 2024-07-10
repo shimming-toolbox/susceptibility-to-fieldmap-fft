@@ -103,8 +103,10 @@ def save_to_nifti(data, image_resolution, output_path):
 
 
 @click.command(help="Compute the magnetic field variation in ppm from a susceptibility distribution in NIfTI format.")
-@click.argument('input_file', required=True, type=click.Path(exists=True))
-@click.argument('output_file', required=True, type=click.Path())
+@click.option('-i','--input','input_file', type=click.Path(exists=True), required=True,
+              help="Input susceptibility distribution, supported extensions: .nii, .nii.gz")
+@click.option('-o', '--output', 'output_file', type=click.Path(), default='fieldmap.nii.gz',
+              help="Output fieldmap, supported extensions: .nii, .nii.gz")
 def main(input_file, output_file):
     """
     Main procedure for performing the simulation.
