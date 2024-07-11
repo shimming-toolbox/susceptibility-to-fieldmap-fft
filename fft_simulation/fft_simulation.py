@@ -107,7 +107,7 @@ def save_to_nifti(data, image_resolution, output_path):
               help="Input susceptibility distribution, supported extensions: .nii, .nii.gz")
 @click.option('-o', '--output', 'output_file', type=click.Path(), default='fieldmap.nii.gz',
               help="Output fieldmap, supported extensions: .nii, .nii.gz")
-def main(input_file, output_file):
+def compute_fieldmap(input_file, output_file):
     """
     Main procedure for performing the simulation.
 

@@ -15,8 +15,8 @@ setup(
     url="https://github.com/shimming-toolbox/susceptibility-to-fieldmap-fft",
     entry_points={
         'console_scripts': [
-            "compute_fieldmap=fft_simulation.fft_simulation:main",
-            "analytical_cases=fft_simulation.analytical_cases:main"
+            "compute_fieldmap=fft_simulation.fft_simulation:compute_fieldmap",
+            "analytical_cases=fft_simulation.analytical_cases:compare_to_analytical"
         ]
     },
     packages=find_packages(exclude=["docs"]),

@@ -171,9 +171,9 @@ class Cylindrical:
               help='Type of geometry for the simulation')
 @click.option('-b', '--buffer', default=2, 
               help='Buffer value for zero-padding.')
-def main(geometry_type, buffer):
+def compare_to_analytical(geometry_type, buffer):
     """
-    Main function for running the Fourier-based simulation with analytical cases.
+    Main function to compare simulated fields to analytical solutions.
 
     Parameters:
     - geometry_type (str): The type of geometry to simulate ('spherical' or 'cylindrical').
