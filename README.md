@@ -127,7 +127,7 @@ analytical_cases -t "spherical"
 
 ### compute_fieldmap
 
-The _compute_fieldmap_ command allows computation of a $B_0$ fieldmap based on a susceptibility distribution given as an input.
+The `compute_fieldmap` command allows computation of a $B_0$ fieldmap based on a susceptibility distribution given as an input.
 
 **Arguments** 
 - input_file : path to the susceptibility distribution (NIfTI file)
