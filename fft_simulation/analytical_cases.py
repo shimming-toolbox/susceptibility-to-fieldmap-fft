@@ -4,7 +4,113 @@ from matplotlib import pyplot as plt
 from scipy.ndimage import rotate
 import click
 
-class Spherical:
+class Visualization:
+    """
+    A class that provides visualization methods for susceptibility distribution 
+    and Bz field variation.
+    """
+
+    def plot_figure1(self, sus_dist, simulated_Bz, geometry_type):
+        """
+        Plot the susceptibility distribution and Bz field variation for a given geometry type.
+
+        Parameters:
+        sus_dist (ndarray): Array representing the susceptibility distribution.
+        simulated_Bz (ndarray): Array representing the Bz field variation.
+        geometry_type (str): Type of geometry.
+
+        Returns:
+        None
+        """
+
+        dimensions_1 = np.array(sus_dist.shape)
+        dimensions_2 = np.array(simulated_Bz.shape)
+
+        fig, axes = plt.subplots(2, 3, figsize=(10, 5), dpi=120)
+        fig.suptitle(f'Susceptibility distribution (top) and Bz field variation (bottom) for a {geometry_type} geometry')
+
+        h = axes[0,0].imshow(sus_dist[dimensions_1[0] // 2, :, :], origin='lower')
+        axes[0,0].set_title('Y-Z plane')
+        axes[0,0].axis("off")
+        plt.colorbar(h, label='Susceptibility [ppm]')
+
+        h = axes[0,1].imshow(sus_dist[:, dimensions_1[0] // 2, :], origin='lower')
+        axes[0,1].set_title('Z-X plane')
+        axes[0,1].axis("off")
+        plt.colorbar(h, label='Susceptibility [ppm]')
+
+        h = axes[0,2].imshow(sus_dist[:, :, dimensions_1[0] // 2], origin='lower')
+        axes[0,2].set_title('X-Y plane')
+        axes[0,2].axis("off")
+        plt.colorbar(h, label='Susceptibility [ppm]')
+
+        # plot section of the b0 field variation
+
+        vmin = np.min(simulated_Bz)*1.1
+        vmax = np.max(simulated_Bz)*1.1
+
+        h = axes[1,0].imshow(simulated_Bz[dimensions_2[0] // 2, :, :], vmin=vmin, vmax=vmax, origin='lower')
+        axes[1,0].set_title('Y-Z plane')
+        axes[1,0].axis("off")
+        plt.colorbar(h, label='Bz [T]')
+
+        h = axes[1,1].imshow(simulated_Bz[:, dimensions_2[0] // 2, :], vmin=vmin, vmax=vmax, origin='lower')
+        axes[1,1].set_title('Z-X plane')
+        axes[1,1].axis("off")
+        plt.colorbar(h, label='Bz [T]')
+
+        h = axes[1,2].imshow(simulated_Bz[:, :, dimensions_2[0] // 2], vmin=vmin, vmax=vmax, origin='lower')
+        axes[1,2].set_title('X-Y plane')
+        axes[1,2].axis("off")
+        plt.colorbar(h, label='Bz [T]')
+
+        plt.show()
+
+    def plot_figure2(self, Bz_analytical, simulated_Bz, geometry_type):
+        """
+        Plot the analytical solution and simulated results for the Bz field variation.
+
+        Parameters:
+        Bz_analytical (ndarray): Array representing the analytical solution for the Bz field variation.
+        simulated_Bz (ndarray): Array representing the simulated Bz field variation.
+        geometry_type (str): Type of geometry.
+
+        Returns:
+        None
+        """
+        vmin = np.min(simulated_Bz)*1.1
+        vmax = np.max(simulated_Bz)*1.1
+
+        dimensions = np.array(Bz_analytical.shape)
+
+        fig, axes = plt.subplots(1, 3, figsize=(10, 3), dpi=120)
+        fig.suptitle(f'Analytical solution and simulated results for the Bz field variation for a {geometry_type} geometry')
+
+        axes[0].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), Bz_analytical[:, dimensions[0]//2, dimensions[0]//2], label='Theory')
+        axes[0].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), simulated_Bz[:, dimensions[0]//2, dimensions[0]//2],'--', label='Simulated')
+        axes[0].set_xlabel('x position [mm]')
+        axes[0].set_ylabel('Field variation [ppm]')
+        axes[0].set_ylim(vmin, vmax)
+        axes[0].legend()
+
+        axes[1].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), Bz_analytical[dimensions[0]//2, :, dimensions[0]//2], label='Theory')
+        axes[1].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), simulated_Bz[dimensions[0]//2, :, dimensions[0]//2],'--', label='Simulated')
+        axes[1].set_xlabel('y position [mm]')
+        axes[1].set_ylabel('Field variation [ppm]')
+        axes[1].set_ylim(vmin, vmax)
+        axes[1].legend()
+
+        axes[2].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), Bz_analytical[dimensions[0]//2, dimensions[0]//2, :], label='Theory')
+        axes[2].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), simulated_Bz[dimensions[0]//2, dimensions[0]//2, :],'--', label='Simulated')
+        axes[2].set_xlabel('z position [mm]')
+        axes[2].set_ylabel('Field variation [ppm]')
+        axes[2].set_ylim(vmin, vmax)
+        axes[2].legend()
+
+        plt.tight_layout()
+        plt.show()
+
+class Spherical(Visualization):
     """
     Represents a spherical object in 3D space.
 
@@ -67,17 +173,13 @@ class Spherical:
 
         r = np.sqrt(x**2 + y**2 + z**2)
 
-        Bz_out = self.sus_diff/3 * (self.R/r)**3 * (3*z**2/r**2 - 1)
-        Bz_out[mask] = 0
-
-        Bz_in = np.zeros(self.matrix)
-
-        Bz_analytical = Bz_out + Bz_in
+        Bz_analytical = self.sus_diff/3 * (self.R/r)**3 * (3*z**2/r**2 - 1)
+        Bz_analytical[mask] = 0 # set the field inside the sphere to zero
 
         return Bz_analytical
         
 
-class Cylindrical:
+class Cylindrical(Visualization):
     """
     Represents a cylindrical object in 3D space.
 
@@ -163,7 +265,13 @@ class Cylindrical:
         Bz_analytical_x = Bz_out_x + Bz_in
         Bz_analytical_y = Bz_out_y + Bz_in
 
-        return Bz_analytical_x, Bz_analytical_y
+        # Create a single 3D array for the analytical solution. Only the lines along the cartesian axes are filled
+        Bz_analytical = np.zeros(self.matrix)
+        Bz_analytical[:, self.matrix[0] //2, self.matrix[0] //2] = Bz_analytical_x[:, self.matrix[0] //2, self.matrix[0] //2]
+        Bz_analytical[self.matrix[0] //2, :, self.matrix[0] //2] = Bz_analytical_y[self.matrix[0] //2, :, self.matrix[0] //2]
+        Bz_analytical[self.matrix[0] //2, self.matrix[0] //2, :] = Bz_analytical_x[self.matrix[0] //2, self.matrix[0] //2, :]
+
+        return Bz_analytical
     
 @click.command(help="Compare the analytical solution to the simulated solution for a spherical or cylindrical geometry.")
 @click.option('-t', '--geometry-type',required=True, 
@@ -207,75 +315,14 @@ def compare_to_analytical(geometry_type, buffer):
         # analytical solution
         Bz_analytical = sphere.analyticial_sol()
 
-        # plot sections of the chi distribution
-        fig, axes = plt.subplots(2, 3, figsize=(10, 5), dpi=120)
-        fig.suptitle('Susceptibility distribution (top) and Bz field variation (bottom) for a spherical geometry')
 
-        h = axes[0,0].imshow(sus_dist[matrix[0] // 2, :, :], origin='lower')
-        axes[0,0].set_title('Y-Z plane')
-        axes[0,0].axis("off")
-        plt.colorbar(h, label='Susceptibility [ppm]')
+        sphere.plot_figure1(sus_dist, calculated_Bz, geometry_type)
+        sphere.plot_figure2(Bz_analytical, calculated_Bz, geometry_type)
 
-        h = axes[0,1].imshow(sus_dist[:, matrix[0] // 2, :], origin='lower')
-        axes[0,1].set_title('Z-X plane')
-        axes[0,1].axis("off")
-        plt.colorbar(h, label='Susceptibility [ppm]')
+    
+    else: 
 
-        h = axes[0,2].imshow(sus_dist[:, :, matrix[0] // 2], origin='lower')
-        axes[0,2].set_title('X-Y plane')
-        axes[0,2].axis("off")
-        plt.colorbar(h, label='Susceptibility [ppm]')
-
-        # plot section of the b0 field variation
-
-        vmin = np.min(calculated_Bz)*1.1
-        vmax = np.max(calculated_Bz)*1.1
-
-        h = axes[1,0].imshow(calculated_Bz[63, :, :],vmin=vmin, vmax=vmax, origin='lower')
-        axes[1,0].axis("off")
-        plt.colorbar(h, label='Field variation [ppm]')
-
-        h = axes[1,1].imshow(calculated_Bz[:, 63, :],vmin=vmin, vmax=vmax, origin='lower')
-        axes[1,1].axis("off")
-        plt.colorbar(h, label='Field variation [ppm]')
-
-        h = axes[1,2].imshow(calculated_Bz[:, :, 63],vmin=vmin, vmax=vmax, origin='lower')
-        axes[1,2].axis("off")
-        plt.colorbar(h, label='Field variation [ppm]')
-        plt.tight_layout()
-        plt.show()
-
-        # comparaison with the analytical solution
-
-        fig, axes = plt.subplots(1, 3, figsize=(10, 3), dpi=120)
-        fig.suptitle('Analytical solution and simulated results for the Bz field variation for a spherical geometry')
-
-        axes[0].plot(np.linspace(-64,64, 128), Bz_analytical[:,63,63], label='Theory')
-        axes[0].plot(np.linspace(-64,64, 128), calculated_Bz[:,63,63],'--', label='Simulated')
-        axes[0].set_ylim(vmin, vmax)
-        axes[0].set_xlabel('x position [mm]')
-        axes[0].set_ylabel('Field variation [ppm]')
-        axes[0].legend()
-
-        axes[1].plot(np.linspace(-64,64, 128), Bz_analytical[63,:,63], label='Theory')
-        axes[1].plot(np.linspace(-64,64, 128), calculated_Bz[63,:,63],'--', label='Simulated')
-        axes[1].set_ylim(vmin, vmax)
-        axes[1].set_xlabel('y position [mm]')
-        axes[1].set_ylabel('Field variation [ppm]')
-        axes[1].legend()
-
-        axes[2].plot(np.linspace(-64,64, 128), Bz_analytical[63,63,:], label='Theory')
-        axes[2].plot(np.linspace(-64,64, 128), calculated_Bz[63,63,:],'--', label='Simulated')
-        axes[2].set_ylim(vmin, vmax)
-        axes[2].set_xlabel('z position [mm]')
-        axes[2].set_ylabel('Field variation [ppm]')
-        axes[2].legend()
-
-        plt.tight_layout()
-        plt.show()
-
-    else: # type is "cylindrical"
-
+        geometry_type = 'cylindrical'
         # create the susceptibility geometry
         cylinder = Cylindrical(matrix, image_res, R, sus_diff)
         sus_dist = cylinder.volume()
@@ -283,71 +330,7 @@ def compare_to_analytical(geometry_type, buffer):
         # compute Bz variation
         calculated_Bz = compute_bz(sus_dist, image_res, buffer)
 
-        Bz_analytical_x, Bz_analytical_y = cylinder.analytical_sol()
+        Bz_analytical = cylinder.analytical_sol()
 
-        # plot sections of the chi distribution
-        fig, axes = plt.subplots(2, 3, figsize=(10, 5), dpi=120)
-        fig.suptitle('Susceptibility distribution (top) and Bz field variation (bottom) for a cylindrical geometry')
-
-        h = axes[0,0].imshow(sus_dist[matrix[0] // 2, :, :], origin='lower')
-        axes[0,0].set_title('Y-Z plane')
-        axes[0,0].axis("off")
-        plt.colorbar(h, label='Susceptibility [ppm]')
-
-        h = axes[0,1].imshow(sus_dist[:, matrix[0] // 2, :], origin='lower')
-        axes[0,1].set_title('X-Z plane')
-        axes[0,1].axis("off")
-        plt.colorbar(h, label='Susceptibility [ppm]')
-
-        h = axes[0,2].imshow(sus_dist[:, :, matrix[0] // 2], origin='lower')
-        axes[0,2].set_title('X-Y plane')
-        axes[0,2].axis("off")
-        plt.colorbar(h, label='Susceptibility [ppm]')
-
-        # plot section of the b0 field variation
-
-        vmin = np.min(calculated_Bz)*1.1
-        vmax = np.max(calculated_Bz)*1.1
-
-        h = axes[1,0].imshow(calculated_Bz[63, :, :],vmin=vmin, vmax=vmax, origin='lower')
-        axes[1,0].axis("off")
-        plt.colorbar(h, label='Field variation [ppm]')
-
-        h = axes[1,1].imshow(calculated_Bz[:, 63, :],vmin=vmin, vmax=vmax, origin='lower')
-        axes[1,1].axis("off")
-        plt.colorbar(h, label='Field variation [ppm]')
-
-        h = axes[1,2].imshow(calculated_Bz[:, :, 63],vmin=vmin, vmax=vmax, origin='lower')
-        axes[1,2].axis("off")
-        plt.colorbar(h, label='Field variation [ppm]')
-        plt.tight_layout()
-        plt.show()
-
-        # comparaison with the analytical solution
-
-        fig, axes = plt.subplots(1, 3, figsize=(10, 3), dpi=120)
-        fig.suptitle('Analytical solution and simulated results for the Bz field variation for a cylindrical geometry')
-
-        axes[0].plot(np.linspace(-64,64, 128), Bz_analytical_x[:,63,63], label='Theory')
-        axes[0].plot(np.linspace(-64,64, 128), calculated_Bz[:,63,63],'--', label='Simulated')
-        axes[0].set_ylim(vmin, vmax)
-        axes[0].set_xlabel('x position [mm]')
-        axes[0].set_ylabel('Field variation [ppm]')
-        axes[0].legend()
-
-        axes[1].plot(np.linspace(-64,64, 128), Bz_analytical_y[63,:,63], label='Theory')
-        axes[1].plot(np.linspace(-64,64, 128), calculated_Bz[63,:,63],'--', label='Simulated')
-        axes[1].set_ylim(vmin, vmax)
-        axes[1].set_xlabel('y position [mm]')
-        axes[1].set_ylabel('Field variation [ppm]')
-        axes[1].legend()
-
-        axes[2].plot(np.linspace(-64,64, 128), Bz_analytical_x[63,63,:], label='Theory')
-        axes[2].plot(np.linspace(-64,64, 128), calculated_Bz[63,63,:],'--', label='Simulated')
-        axes[2].set_ylim(vmin, vmax)
-        axes[2].set_xlabel('z position [mm]')
-        axes[2].set_ylabel('Field variation [ppm]')
-        axes[2].legend()
-
-        plt.tight_layout()
-        plt.show()
+        cylinder.plot_figure1(sus_dist, calculated_Bz, geometry_type)
+        cylinder.plot_figure2(Bz_analytical, calculated_Bz, geometry_type) 
