@@ -95,10 +95,6 @@ conda create --name <name of your environement> python=3.9
 conda activate <name of your environment>
 ```
 
-- Go to the develop branch (temporary)
-
-```
-git checkout develop
 ```
 
 - Install the package
