@@ -95,8 +95,6 @@ conda create --name <name of your environement> python=3.9
 conda activate <name of your environment>
 ```
 
-```
-
 - Install the package
 
 ```
@@ -108,38 +106,42 @@ You will need to ```conda activate <name of your environment>``` each time you w
 ## Usage
 Once the package is installed, the commands can be run directly from the terminal. Here is the description of the two commands available.
 
-### analytical_cases
-
-The _analytical_cases_ command allows for comparaison between simulated and analytical results for a spherical and cylindrical phantom. 
-
-**Options** 
-- -t, geometry type : 'spherical' or 'cylindrical'
-- -b, buffer (optional, default=2): Buffer value for zero-padding around the phantom
-
-**Return** 
-Plots to visualize the results
-
-Example:
-```
-analytical_cases -t "spherical"
-```
-
-
 ### compute_fieldmap
 
 The `compute_fieldmap` command allows computation of a $B_0$ fieldmap based on a susceptibility distribution given as an input.
 
-**Arguments** 
+**Inputs** 
 - input_file : path to the susceptibility distribution (NIfTI file)
 - output_file : path for the fieldmap (NIfTI file)
 
-**Return** 
+**Output** 
 The calculated fieldmap at the specified path.
 
 Example:
 ```
 compute_fieldmap "inpath/susceptibility_distribution.nii.gz" "outpath/fieldmap.nii.gz"
 ```
+
+### analytical_cases
+
+The _analytical_cases_ command allows for comparaison between simulated and analytical results for a spherical and cylindrical phantom. 
+
+**Inputs** 
+- -t, geometry type : 'spherical' or 'cylindrical'
+- -b, buffer (optional, default=2): Buffer value for zero-padding around the phantom
+
+**Outputs** 
+Plots to visualize the results
+
+Example:
+```
+analytical_cases -t "spherical"
+```
+The figures generated would be 
+
+![alt text](Figure_1.png)
+
+![alt text](Figure_2.png)
 
 ## References
 
