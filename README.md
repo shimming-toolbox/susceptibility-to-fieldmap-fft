@@ -117,7 +117,7 @@ The _analytical_cases_ command allows for comparaison between simulated and anal
 - -b, buffer (optional, default=2): Buffer value for zero-padding around the phantom
 
 **Return** 
-Plots to visialize the results
+Plots to visualize the results
 
 Example:
 ```
