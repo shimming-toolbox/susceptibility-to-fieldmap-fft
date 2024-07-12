@@ -10,7 +10,7 @@ class Visualization:
     and Bz field variation.
     """
 
-    def plot_figure1(self, sus_dist, simulated_Bz, geometry_type):
+    def plot_susceptibility_and_fieldmap(self, sus_dist, simulated_Bz, geometry_type):
         """
         Plot the susceptibility distribution and Bz field variation for a given geometry type.
 
@@ -66,7 +66,7 @@ class Visualization:
 
         plt.show()
 
-    def plot_figure2(self, Bz_analytical, simulated_Bz, geometry_type):
+    def plot_comparaison_analytical(self, Bz_analytical, simulated_Bz, geometry_type):
         """
         Plot the analytical solution and simulated results for the Bz field variation.
 
@@ -157,7 +157,7 @@ class Spherical(Visualization):
         """
         return np.where(self.mask() == True, self.sus_diff, 0)
     
-    def analyticial_sol(self):
+    def analytical_sol(self):
         """
         Calculates the analytical solution for the magnetic field inside and outside the sphere.
 
@@ -306,31 +306,18 @@ def compare_to_analytical(geometry_type, buffer):
     R = 15 # mm
     sus_diff = 9 # ppm
 
-    if geometry_type == 'spherical':
-        # create the susceptibility geometry
-        sphere = Spherical(matrix, image_res, R, sus_diff)
-        sus_dist = sphere.volume()
-        # compute Bz variation
-        calculated_Bz = compute_bz(sus_dist, image_res, buffer)
-        # analytical solution
-        Bz_analytical = sphere.analyticial_sol()
+    dicto = {'spherical': Spherical(matrix, image_res, R, sus_diff),
+              'cylindrical': Cylindrical(matrix, image_res, R, sus_diff)}
 
+    # create the susceptibility geometry
+    geometry = dicto[geometry_type]
+    sus_dist = geometry.volume()
 
-        sphere.plot_figure1(sus_dist, calculated_Bz, geometry_type)
-        sphere.plot_figure2(Bz_analytical, calculated_Bz, geometry_type)
+    # compute Bz variation
+    calculated_Bz = compute_bz(sus_dist, image_res, buffer)
+    # analytical solution
+    Bz_analytical = geometry.analytical_sol()
 
-    
-    else: 
-
-        geometry_type = 'cylindrical'
-        # create the susceptibility geometry
-        cylinder = Cylindrical(matrix, image_res, R, sus_diff)
-        sus_dist = cylinder.volume()
-
-        # compute Bz variation
-        calculated_Bz = compute_bz(sus_dist, image_res, buffer)
-
-        Bz_analytical = cylinder.analytical_sol()
-
-        cylinder.plot_figure1(sus_dist, calculated_Bz, geometry_type)
-        cylinder.plot_figure2(Bz_analytical, calculated_Bz, geometry_type) 
+    # plot the results
+    geometry.plot_susceptibility_and_fieldmap(sus_dist, calculated_Bz, geometry_type)
+    geometry.plot_comparaison_analytical(Bz_analytical, calculated_Bz, geometry_type)
