@@ -139,9 +139,11 @@ analytical_cases -t "spherical"
 ```
 The figures generated would be 
 
-![alt text](Figure_1.png)
+![Figure_1](https://github.com/user-attachments/assets/a2f49a83-dc8f-4d94-a5ba-075e7b8675aa)
 
-![alt text](Figure_2.png)
+
+![Figure_2](https://github.com/user-attachments/assets/c4c2d34c-7153-43d8-ad21-8af6f49427de)
+
 
 ## References
 
