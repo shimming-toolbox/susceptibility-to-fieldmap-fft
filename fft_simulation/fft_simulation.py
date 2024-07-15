@@ -12,7 +12,7 @@ def is_nifti(filepath):
     Returns:
         bool: True if the file is a NIfTI file, False otherwise.
     """
-    if filepath[-4:] == '.nii' or filepath[-7:] == '.nii.gz':
+    if filepath.endswith('.nii') or filepath.endswith('.nii.gz'):
         return True
     else:
         return False
@@ -102,31 +102,21 @@ def save_to_nifti(data, image_resolution, output_path):
 
 
 
-@click.command(help="Compute the magnetic field Bz in ppm from a susceptibility distribution in NIfTI format.")
-@click.argument('input_file', required=True, type=click.Path(exists=True))
-@click.argument('output_file', required=True, type=click.Path())
-def main(input_file, output_file):
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("-i",
-    #                     dest="input_file",
-    #                     type=str,
-    #                     required=True,
-    #                     help="Path to the NIfTI file input.")
-    
-    # parser.add_argument("-o",
-    #                     dest="output_file",
-    #                     type=str,
-    #                     required=True,
-    #                     help="Path to the NIfTI file ouput.")
-    # args = parser.parse_args()
-
+@click.command(help="Compute the magnetic field variation in ppm from a susceptibility distribution in NIfTI format.")
+@click.option('-i','--input','input_file', type=click.Path(exists=True), required=True,
+              help="Input susceptibility distribution, supported extensions: .nii, .nii.gz")
+@click.option('-o', '--output', 'output_file', type=click.Path(), default='fieldmap.nii.gz',
+              help="Output fieldmap, supported extensions: .nii, .nii.gz")
+def compute_fieldmap(input_file, output_file):
     """
-    This script processes a NIfTI file by performing a simple operation on the voxel data 
-        and saves the modified data to a new NIfTI file.
+    Main procedure for performing the simulation.
 
-        INPUT_FILE: Path to the input susceptibility distribution in NIfTI format.
+    Args:
+        input_file (str): Path to the susceptibility distribution in NIfTI format.
+        output_file (str): Path for the computed fieldmap in NIfTI format.
 
-        OUTPUT_FILE: Path to the output fieldmap where the data will be saved in NIfTI format.
+    Returns:
+        None
     """
     if is_nifti(input_file):
         sus_dist, img_res = load_sus_dist(input_file)
@@ -134,9 +124,5 @@ def main(input_file, output_file):
         save_to_nifti(fieldmap, img_res, output_file)
     else:
         print("The input file must be NIfTI.")
-
-
-if __name__ == "__main__":
-    main()
 
     

@@ -81,59 +81,69 @@ These final equations are the ones used in the function **compute_bz**, which ca
 
 ## Installation 
 
-First, clone the repository
+- Clone the repository
 
 ```
 git clone https://github.com/shimming-toolbox/susceptibility-to-fieldmap-fft.git
-```
-
-Navigate to the project directory
-
-```
 cd susceptibility-to-fieldmap-fft
 ```
 
-Install the requirements
+- Create a virtual environnement 
 
 ```
-pip install -r requirements.txt
+conda create --name <name of your environement> python=3.9
+conda activate <name of your environment>
 ```
+
+- Install the package
+
+```
+pip install .
+```
+
+You will need to ```conda activate <name of your environment>``` each time you want to use the package.
 
 ## Usage
-To execute the scripts, you need to naviagte into the fft_simulation folder.
+Once the package is installed, the commands can be run directly from the terminal. Here is the description of the two commands available.
 
-### Analytical cases
+### compute_fieldmap
 
-The _analytical_case.py_ script allows for comparaison between simulated and analytical results for a spherical and cylindrical phantom. 
+The `compute_fieldmap` command allows computation of a $B_0$ fieldmap based on a susceptibility distribution given as an input.
 
-**Arguments** 
-- -t, type : 'spherical' or 'cylindrical'
-- -b, buffer (optional, default=2): Buffer value for zero-padding around the phantom
+**Inputs** 
+- input_file : path to the susceptibility distribution (NIfTI file)
+- output_file : path for the fieldmap (NIfTI file)
 
-**Return** 
-Plots to visialize the results
-
-Example:
-```
-python analytical_cases.py -t "spherical"
-```
-
-
-### fft_simulation
-
-The _fft_simulation.py_ script allow computation of a $B_0$ fieldmap based on a susceptibility distribution given as an input.
-
-**Arguments** 
-- -input_file : path to the susceptibility distribution (NIfTI file)
-- -output_file : path for the fieldmap (NIfTI file)
-
-**Return** 
+**Output** 
 The calculated fieldmap at the specified path.
 
 Example:
 ```
-python fft_simulation.py "\your\sus_dist\path.nii" "\yout\fieldmap\path.nii"
+compute_fieldmap "inpath/susceptibility_distribution.nii.gz" "outpath/fieldmap.nii.gz"
 ```
+
+### analytical_cases
+
+The _analytical_cases_ command allows for comparaison between simulated and analytical results for a spherical and cylindrical phantom. 
+
+**Inputs** 
+- -t, geometry type : 'spherical' or 'cylindrical'
+- -b, buffer (optional, default=2): Buffer value for zero-padding around the phantom
+
+**Outputs** 
+Plots to visualize the results
+
+Example:
+```
+analytical_cases -t "spherical"
+```
+The figures generated would be 
+
+![Figure_1](https://github.com/user-attachments/assets/a2f49a83-dc8f-4d94-a5ba-075e7b8675aa)
+
+
+![Figure_2](https://github.com/user-attachments/assets/c4c2d34c-7153-43d8-ad21-8af6f49427de)
+
 
 ## References
 
