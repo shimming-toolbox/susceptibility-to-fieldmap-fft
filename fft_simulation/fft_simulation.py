@@ -33,8 +33,9 @@ def load_sus_dist(filepath):
     susceptibility_distribution = image.get_fdata()
     header = image.header
     image_resolution = np.array(header.get_zooms())
+    affine_matrix = image.affine
 
-    return susceptibility_distribution, image_resolution
+    return susceptibility_distribution, image_resolution, affine_matrix
 
 
 def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), buffer=1):
@@ -84,20 +85,19 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
 
     return volume_without_buffer
 
-def save_to_nifti(data, image_resolution, output_path):
+def save_to_nifti(data, affine_matrix, output_path):
     """
     Save data to NIfTI format to a specified output path.
 
     Args:
         data (np.array): the data to save
-        img_res (np.array): the spatial resolution of the data
+        affine_matrix (np.array): the affine matrix of the data
         output_path (str): the output path to save the file
 
     Returns:
         None
     """
-    affine = np.diag(np.append(image_resolution,1))
-    nifti_image = nib.Nifti1Image(data, affine)
+    nifti_image = nib.Nifti1Image(data, affine_matrix)
     nib.save(nifti_image, output_path)
 
 
@@ -119,9 +119,9 @@ def compute_fieldmap(input_file, output_file):
         None
     """
     if is_nifti(input_file):
-        sus_dist, img_res = load_sus_dist(input_file)
-        fieldmap = compute_bz(sus_dist, img_res)
-        save_to_nifti(fieldmap, img_res, output_file)
+        susceptibility_distribution, image_resolution, affine_matrix = load_sus_dist(input_file)
+        fieldmap = compute_bz(susceptibility_distribution, image_resolution)
+        save_to_nifti(fieldmap, affine_matrix, output_file)
     else:
         print("The input file must be NIfTI.")
 

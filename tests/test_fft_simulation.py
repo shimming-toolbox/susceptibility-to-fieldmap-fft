@@ -15,14 +15,15 @@ def test_is_nifti():
     
 def test_load_sus_dist(tmpdir):
     data = np.random.rand(32, 32, 32)
-    affine = np.eye(4)
-    nifti_imagw = nib.Nifti1Image(data, affine)
+    affine_matrix = np.eye(4)
+    nifti_imagw = nib.Nifti1Image(data, affine_matrix)
     filepath = os.path.join(tmpdir, 'output_image.nii')
     nib.save(nifti_imagw, filepath)
-    loaded_data, image_resolution = load_sus_dist(filepath)
+    loaded_data, image_resolution, loaded_affine_matrix = load_sus_dist(filepath)
 
     assert np.array_equal(loaded_data, data), "load_sus_dist failed to retrive the image data correctly"
     assert np.array_equal(image_resolution, [1,1,1]), "load_sus_dist failed to retrive the image resolution correctly"
+    assert np.array_equal(loaded_affine_matrix, affine_matrix), "load_sus_dist failed to retrive the affine matrix correctly"
 
 def test_compute_bz_zero_susceptibility():
     zero_susceptibility = np.zeros((64,64,64))
@@ -39,17 +40,16 @@ def test_compute_bz_uniform_susceptibility():
 
 def test_save_to_nifti(tmpdir):
     data = np.random.rand(32, 32, 32)
-    image_resolution = np.array([1,1,1])
+    affine_matrix = np.eye(4)
     filepath = os.path.join(tmpdir, 'output_image.nii')
-    save_to_nifti(data, image_resolution, filepath)
+    save_to_nifti(data, affine_matrix, filepath)
 
     loaded_nii = nib.load(filepath)
-    header = loaded_nii.header
     loaded_data = loaded_nii.get_fdata()
-    loaded_image_resolution = header.get_zooms()
+    loaded_affine_matrix = loaded_nii.affine
 
     assert np.array_equal(data, loaded_data), "save_to_nifti failed to save the image data correctly"
-    assert np.array_equal(image_resolution, loaded_image_resolution), "save_to_nifti failed to save the image resolution correctly"
+    assert np.array_equal(affine_matrix, loaded_affine_matrix), "save_to_nifti failed to save the affine matrix correctly"
 
 
 
