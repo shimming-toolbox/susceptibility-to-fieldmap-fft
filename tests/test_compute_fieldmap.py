@@ -1,4 +1,4 @@
-from fft_simulation.fft_simulation import is_nifti, load_sus_dist, save_to_nifti, compute_bz
+from functions.compute_fieldmap import is_nifti, load_sus_dist, save_to_nifti, compute_bz
 import numpy as np
 import nibabel as nib
 import os

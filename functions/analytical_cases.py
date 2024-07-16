@@ -1,4 +1,4 @@
-from fft_simulation.fft_simulation import compute_bz
+from functions.compute_fieldmap import compute_bz
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.ndimage import rotate
