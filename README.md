@@ -77,7 +77,7 @@ In order to simulate this scenario, we can assume that $\tilde B_{dz} (\mathbf{k
 $$ \tilde B_{dz-demod} (\mathbf{k}) =  \Delta \tilde \chi (\mathbf{k}) \cdot B_0 \bigg (\frac{1}{3} - \frac{k_z^2}{|\mathbf{k}|^2} \bigg) $$
 
 
-These final equations are the ones used in the function **compute_bz**, which calculates the magnetic field offset produced by a susceptibility distribution subject to a uniform external magnetic field $B_0$ (oriented along the z-axis).
+These final equations are the ones used in the **compute_fieldmap** procedure, which calculates the magnetic field offset produced by a susceptibility distribution subject to a uniform external magnetic field $B_0$ (oriented along the z-axis).
 
 ## Installation 
 
