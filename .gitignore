@@ -1,3 +1,8 @@
-*.egg-info
+# Python-related temp files
+*.egg-info/
 **/__pycache__/
-env/
+.coverage
+.pytest_cache/
+.ipynb_checkpoints/
+.vscode/
+build/
