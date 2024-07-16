@@ -124,7 +124,7 @@ compute_fieldmap "inpath/susceptibility_distribution.nii.gz" "outpath/fieldmap.n
 
 ### analytical_cases
 
-The _analytical_cases_ command allows for comparaison between simulated and analytical results for a spherical and cylindrical phantom. 
+The `analytical_cases` command allows for comparaison between simulated and analytical results for a spherical and cylindrical phantom. 
 
 **Inputs** 
 - -t, geometry type : 'spherical' or 'cylindrical'
