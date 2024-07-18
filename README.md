@@ -119,7 +119,7 @@ The calculated fieldmap at the specified path.
 
 Example:
 ```
-compute_fieldmap "inpath/susceptibility_distribution.nii.gz" "outpath/fieldmap.nii.gz"
+compute_fieldmap -i "inpath/susceptibility_distribution.nii.gz" -o "outpath/fieldmap.nii.gz"
 ```
 
 ### analytical_cases
