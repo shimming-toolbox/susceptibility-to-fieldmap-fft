@@ -1,6 +1,7 @@
 import numpy as np
 import nibabel as nib
 import click
+from time import perf_counter
 
 def is_nifti(filepath):
     """
@@ -61,11 +62,10 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
     # creating the k-space grid with the buffer
     new_dimensions = buffer*np.array(dimensions)
     kmax = 1/(2*image_resolution)
-    interval = 2*kmax/new_dimensions
 
-    [kx, ky, kz] = np.meshgrid(np.arange(-kmax[0], kmax[0], interval[0]),
-                                np.arange(-kmax[1], kmax[1], interval[1]),
-                                np.arange(-kmax[2], kmax[2], interval[2]))
+    [kx, ky, kz] = np.meshgrid(np.linspace(-kmax[0], kmax[0], new_dimensions[0]),
+                                np.linspace(-kmax[1], kmax[1], new_dimensions[1]),
+                                np.linspace(-kmax[2], kmax[2], new_dimensions[2]))
 
     # FFT procedure
     # undetermined at the center of k-space
@@ -119,9 +119,16 @@ def compute_fieldmap(input_file, output_file):
         None
     """
     if is_nifti(input_file):
+        start_time = perf_counter()
+        print('Start')
         susceptibility_distribution, image_resolution, affine_matrix = load_sus_dist(input_file)
+        print('Susceptibility distribution loaded')
         fieldmap = compute_bz(susceptibility_distribution, image_resolution)
+        print('Fieldmap simulated')
         save_to_nifti(fieldmap, affine_matrix, output_file)
+        print('Saving to NIfTI format')
+        end_time = perf_counter()
+        print(f'End. Runtime: {end_time-start_time:.2f} seconds')
     else:
         print("The input file must be NIfTI.")
 
