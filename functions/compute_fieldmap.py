@@ -1,6 +1,7 @@
 import numpy as np
 import nibabel as nib
 import click
+from time import time
 
 def is_nifti(filepath):
     """
@@ -118,9 +119,16 @@ def compute_fieldmap(input_file, output_file):
         None
     """
     if is_nifti(input_file):
+        tic = time()
+        print('Start')
         susceptibility_distribution, image_resolution, affine_matrix = load_sus_dist(input_file)
+        print('Susceptibility distribution loaded')
         fieldmap = compute_bz(susceptibility_distribution, image_resolution)
+        print('Fieldmap simulated')
         save_to_nifti(fieldmap, affine_matrix, output_file)
+        print('Saving to NIfTI format')
+        tac = time()
+        print(f'End. Runtime: {tac-tic:.2f} seconds')
     else:
         print("The input file must be NIfTI.")
 
