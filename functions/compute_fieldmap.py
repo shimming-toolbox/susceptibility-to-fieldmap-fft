@@ -32,7 +32,7 @@ def load_sus_dist(filepath):
 
     image = nib.load(filepath)
     susceptibility_distribution = image.get_fdata()
-    header = image.header
+    header = image.header 
     image_resolution = np.array(header.get_zooms())
     affine_matrix = image.affine
 
@@ -65,7 +65,7 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
 
     [kx, ky, kz] = np.meshgrid(np.linspace(-kmax[0], kmax[0], new_dimensions[0]),
                                 np.linspace(-kmax[1], kmax[1], new_dimensions[1]),
-                                np.linspace(-kmax[2], kmax[2], new_dimensions[2]))
+                                np.linspace(-kmax[2], kmax[2], new_dimensions[2]), indexing='ij')
 
     # FFT procedure
     # undetermined at the center of k-space
