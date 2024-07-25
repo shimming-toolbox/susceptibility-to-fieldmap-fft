@@ -32,7 +32,7 @@ def load_sus_dist(filepath):
 
     image = nib.load(filepath)
     susceptibility_distribution = image.get_fdata()
-    header = image.header
+    header = image.header 
     image_resolution = np.array(header.get_zooms())
     affine_matrix = image.affine
 
