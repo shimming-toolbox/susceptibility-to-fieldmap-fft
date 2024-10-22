@@ -39,7 +39,7 @@ def load_sus_dist(filepath):
     return susceptibility_distribution, image_resolution, affine_matrix
 
 
-def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), buffer=1):
+def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), buffer=1.2):
     """
     Compute the Bz field variation in ppm based on a susceptibility distribution
     using a Fourier-based method.
@@ -55,12 +55,20 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
         volume_without_buffer (numpy.ndarray): The computed magnetic field Bz in ppm.
 
     """
+    print(buffer)
+    #breakpoint()
+    #susceptibility_distribution=np.pad(susceptibility_distribution, 50, mode='reflect')
 
     # dimensions needs to be a numpy.array
     dimensions = np.array(susceptibility_distribution.shape)
 
     # creating the k-space grid with the buffer
     new_dimensions = buffer*np.array(dimensions)
+
+    for i in range(3):
+        new_dimensions[i] = int(np.round(new_dimensions[i]))
+    new_dimensions=new_dimensions.astype(int)
+    breakpoint()
     kmax = 1/(2*image_resolution)
 
     [kx, ky, kz] = np.meshgrid(np.linspace(-kmax[0], kmax[0], new_dimensions[0]),
@@ -82,7 +90,7 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
     # retrive the inital FOV
     volume_with_buffer = np.real(np.fft.ifftn(Bz_fft))
     volume_without_buffer = volume_with_buffer[0:dimensions[0], 0:dimensions[1], 0:dimensions[2]]
-
+    #volume_without_buffer = volume_with_buffer[50:-50, 50:-50, 50:-50,]
     return volume_without_buffer
 
 def save_to_nifti(data, affine_matrix, output_path):

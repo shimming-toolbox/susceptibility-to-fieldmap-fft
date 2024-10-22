@@ -6,3 +6,6 @@
 .ipynb_checkpoints/
 .vscode/
 build/
+*.nii.gz
+.DS_Store
+*.nii
