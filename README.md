@@ -113,6 +113,8 @@ The `compute_fieldmap` command allows computation of a $B_0$ fieldmap based on a
 **Inputs** 
 - input_file : path to the susceptibility distribution (NIfTI file)
 - output_file : path for the fieldmap (NIfTI file)
+- -b, buffer (optional, default=50 voxels): Value-padding the edges of the volume
+- -m, method (optional, default=edge): Method used for value-padding, see np.pad options
 
 **Output** 
 The calculated fieldmap at the specified path.

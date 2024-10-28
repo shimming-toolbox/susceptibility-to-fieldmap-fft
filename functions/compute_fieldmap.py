@@ -61,15 +61,17 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
 
     # Pad the susceptibility distribution
     susceptibility_distribution=np.pad(susceptibility_distribution, buffer, mode=mode)
-
+    
     # dimensions needs to be a numpy.array
     dimensions = np.array(susceptibility_distribution.shape)
 
     kmax = 1/(2*image_resolution)
 
-    [kx, ky, kz] = np.meshgrid(np.linspace(-kmax[0], kmax[0], dimensions[0]),
-                                np.linspace(-kmax[1], kmax[1], dimensions[1]),
-                                np.linspace(-kmax[2], kmax[2], dimensions[2]), indexing='ij')
+    interval = 2 * kmax / dimensions
+
+    [kx, ky, kz] = np.meshgrid(np.linspace(-kmax[0], kmax[0] - interval[0], dimensions[0]),
+                                np.linspace(-kmax[1], kmax[1]- interval[1], dimensions[1]),
+                                np.linspace(-kmax[2], kmax[2] - interval[2], dimensions[2]), indexing='ij')
 
     # FFT procedure
     # undetermined at the center of k-space
