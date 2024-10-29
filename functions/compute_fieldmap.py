@@ -60,8 +60,13 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
     """
 
     # Pad the susceptibility distribution
-    susceptibility_distribution=np.pad(susceptibility_distribution, buffer, mode=mode)
-    
+
+    if mode == 'b0SimISMRM':
+            susceptibility_distribution=np.pad(susceptibility_distribution, ((buffer, buffer), (0,buffer), (buffer,buffer)), mode='edge')
+            susceptibility_distribution=np.pad(susceptibility_distribution, ((0,0),(buffer,0),(0,0)), mode='constant', constant_values=0.35)
+    else:
+        susceptibility_distribution=np.pad(susceptibility_distribution, buffer, mode=mode)
+
     # dimensions needs to be a numpy.array
     dimensions = np.array(susceptibility_distribution.shape)
 
