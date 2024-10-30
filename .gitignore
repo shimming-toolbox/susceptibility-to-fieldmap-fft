@@ -9,3 +9,5 @@ build/
 *.nii.gz
 .DS_Store
 *.nii
+run.py
+tests.py
