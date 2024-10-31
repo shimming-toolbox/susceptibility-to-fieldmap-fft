@@ -94,23 +94,21 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
 
     with np.errstate(divide='ignore', invalid='ignore'):
         x_kernel = 1/3 - kz**2/k2
-
-        #x_kernel[int(dimensions[0]/2), int(dimensions[1]/2), int(dimensions[2]/2-0.5)] = 1/3
-
+        
+        x_kernel[int(dimensions[0]/2-1/2*dimensions[0]%2), int(dimensions[1]/2-1/2*dimensions[1]%2), int(dimensions[2]/2-1/2*dimensions[2]%2)] = 1/3
+        
         kernel = np.fft.fftshift(x_kernel)
-        kernel_dims=kernel.shape
-        kernel[(dimensions[0]%2)*(kernel_dims[0]-1),(dimensions[1]%2)*(kernel_dims[1]-1),(dimensions[2]%2)*(kernel_dims[2]-1)] = 1/3
-    print('1')
+
     FFT_chi = np.fft.fftn(susceptibility_distribution, dimensions)
-    print('2')
+
     FFT_chi[0,0,0] = FFT_chi[0,0,0] + np.prod(dimensions)*susceptibility_distribution[0,0,0]
-    print('3')
+
     Bz_fft = kernel*FFT_chi
-    print('4')
+
     # retrive the inital FOV
-    print('5')
+
     volume_with_buffer = np.real(np.fft.ifftn(Bz_fft))
-    print('6')
+
     volume_without_buffer = volume_with_buffer[buffer:-buffer, buffer:-buffer, buffer:-buffer]
 
     return volume_without_buffer
