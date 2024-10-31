@@ -95,11 +95,11 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
     with np.errstate(divide='ignore', invalid='ignore'):
         x_kernel = 1/3 - kz**2/k2
 
-        x_kernel[int(dimensions[0]/2), int(dimensions[1]/2), int(dimensions[2]/2-0.5)] = 1/3
+        #x_kernel[int(dimensions[0]/2), int(dimensions[1]/2), int(dimensions[2]/2-0.5)] = 1/3
 
         kernel = np.fft.fftshift(x_kernel)
-        
-        #kernel[(dimensions[0]%2)*(kernel_dims[0]-1),(dimensions[1]%2)*(kernel_dims[1]-1),(dimensions[2]%2)*(kernel_dims[2]-1)] = 1/3
+        kernel_dims=kernel.shape
+        kernel[(dimensions[0]%2)*(kernel_dims[0]-1),(dimensions[1]%2)*(kernel_dims[1]-1),(dimensions[2]%2)*(kernel_dims[2]-1)] = 1/3
     print('1')
     FFT_chi = np.fft.fftn(susceptibility_distribution, dimensions)
     print('2')

@@ -90,6 +90,7 @@ class Visualization:
         axes[0].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), simulated_Bz[:, dimensions[0]//2, dimensions[0]//2],'--', label='Simulated')
         axes[0].set_xlabel('x position [mm]')
         axes[0].set_ylabel('Field variation [ppm]')
+
         axes[0].set_ylim(vmin, vmax)
         axes[0].legend()
 
@@ -315,6 +316,7 @@ def compare_to_analytical(geometry_type, buffer):
 
     # compute Bz variation
     calculated_Bz = compute_bz(sus_dist, image_res, buffer)
+
     # analytical solution
     Bz_analytical = geometry.analytical_sol()
 
