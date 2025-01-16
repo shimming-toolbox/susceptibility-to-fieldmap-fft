@@ -6,3 +6,6 @@
 .ipynb_checkpoints/
 .vscode/
 build/
+data/
+trash/
+.DS_Store
