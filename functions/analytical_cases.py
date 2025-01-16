@@ -305,6 +305,11 @@ def compare_to_analytical(geometry_type, buffer, matrix=[128,128,128], image_res
             and a susceptibility difference of 9 ppm for the spherical and cylindrical geometries.
     """
 
+    compare_to_analytical_internal(geometry_type, buffer, matrix, image_res, radius, chi)
+
+
+def compare_to_analytical_internal(geometry_type, buffer, matrix=[128,128,128], image_res=[1,1,1], radius=15, chi=9):
+
     # Type check the matrix argument
     if not isinstance(matrix, (list, tuple, np.ndarray)):
         raise TypeError("matrix must be a list, tuple, or numpy array.")
