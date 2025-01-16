@@ -109,6 +109,7 @@ class Visualization:
         axes[2].legend()
 
         plt.tight_layout()
+        plt.savefig(f'{geometry_type}_analytical_vs_simulated.png', dpi=300)
         plt.show()
 
 class Spherical(Visualization):
@@ -302,7 +303,7 @@ def compare_to_analytical(geometry_type, buffer):
             and a susceptibility difference of 9 ppm for the spherical and cylindrical geometries.
     """
 
-    matrix = np.array([128,128,129])
+    matrix = np.array([128,128,128])
     image_res = np.array([1,1,1]) # mm
     R = 15 # mm
     sus_diff = 9 # ppm
