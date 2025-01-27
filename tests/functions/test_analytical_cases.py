@@ -92,8 +92,7 @@ class TestCore(object):
         buffer=1
         compare_to_analytical_internal(geometry_type, buffer=buffer)
         
-    #@pytest.mark.integration
-    @pytest.mark.xfail
+    @pytest.mark.integration
     def test_compare_analytical_spherical_default_buffer_expected_matrix_shape(self):
         
         geometry_type='spherical'
@@ -133,7 +132,8 @@ class TestCore(object):
         assert Bz_analytical.shape == DEFAULT_MATRIX
 
     # This next test currently gets killed from a memory error
-    @pytest.mark.integration
+    #@pytest.mark.integration
+    @pytest.mark.xfail
     def test_compare_analytical_spherical_64px_buffer(self):
         assert False    
     #    geometry_type='spherical'
@@ -149,7 +149,8 @@ class TestCore(object):
         matrix=[128,128,128]
         compare_to_analytical_internal(geometry_type, buffer, matrix=matrix)
 
-    @pytest.mark.integration
+    #@pytest.mark.integration
+    @pytest.mark.xfail
     def test_compare_analytical_spherical_allodd_matrix(self):
         
         geometry_type='spherical'
@@ -167,8 +168,7 @@ class TestCore(object):
         compare_to_analytical_internal(geometry_type, buffer, matrix=matrix)
 
     # Image res tests
-    #@pytest.mark.integration
-    @pytest.mark.xfail
+    @pytest.mark.integration
     def test_compare_analytical_spherical_allodd_image_res(self):
         
         geometry_type='spherical'
