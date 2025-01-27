@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.ndimage import rotate
 import click
+import copy
 
 class Visualization:
     """
@@ -350,3 +351,5 @@ def compare_to_analytical_internal(geometry_type, buffer, matrix=[128,128,128], 
     # plot the results
     geometry.plot_susceptibility_and_fieldmap(sus_dist, calculated_Bz, geometry_type)
     geometry.plot_comparaison_analytical(Bz_analytical, calculated_Bz, geometry_type)
+
+    return calculated_Bz, Bz_analytical
