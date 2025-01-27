@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.ndimage import rotate
 import click
+import copy
 
 class Visualization:
     """
@@ -279,13 +280,17 @@ class Cylindrical(Visualization):
               help='Type of geometry for the simulation')
 @click.option('-b', '--buffer', default=2, 
               help='Buffer value for zero-padding.')
-def compare_to_analytical(geometry_type, buffer):
+def compare_to_analytical(geometry_type, buffer, matrix=[128,128,128], image_res=[1,1,1], radius=15, chi=9):
     """
     Main function to compare simulated fields to analytical solutions.
 
     Parameters:
     - geometry_type (str): The type of geometry to simulate ('spherical' or 'cylindrical').
     - buffer (float): The buffer size for the simulation.
+    - matrix ([int, int, int]): Volume dimensions in terms of number of pixels.
+    - image_res ([float, float, float]): Image resolution in mm ([x,y,z]).
+    - radius (float): Radius (mm) of the geometrical object.
+    - chi (float): Susceptibility difference in ppm.
 
     Returns:
     - None
@@ -301,10 +306,35 @@ def compare_to_analytical(geometry_type, buffer):
             and a susceptibility difference of 9 ppm for the spherical and cylindrical geometries.
     """
 
-    matrix = np.array([128,128,128])
-    image_res = np.array([1,1,1]) # mm
-    R = 15 # mm
-    sus_diff = 9 # ppm
+    compare_to_analytical_internal(geometry_type, buffer, matrix, image_res, radius, chi)
+
+
+def compare_to_analytical_internal(geometry_type, buffer, matrix=[128,128,128], image_res=[1,1,1], radius=15, chi=9):
+
+    # Type check the matrix argument
+    if not isinstance(matrix, (list, tuple, np.ndarray)):
+        raise TypeError("matrix must be a list, tuple, or numpy array.")
+    if len(matrix) != 3:
+        raise ValueError("matrix must have 3 elements (x, y, z dimensions).")
+    if not all(isinstance(dim, int) for dim in matrix):
+        raise TypeError("All elements of matrix must be integers.")
+    if not all(dim > 0 for dim in matrix):
+        raise ValueError("All matrix dimensions must be positive.")
+    matrix = np.array(matrix) # Convert to numpy array for easier use later
+
+    # Type check the image_res argument
+    if not isinstance(image_res, (list, tuple, np.ndarray)):
+        raise TypeError("image_res must be a list, tuple, or numpy array.")
+    if len(image_res) != 3:
+        raise ValueError("image_res must have 3 elements (x, y, z resolutions).")
+    if not all(isinstance(res, (int, float)) for res in image_res):
+        raise TypeError("All elements of image_res must be numbers (int or float).")
+    if not all(res > 0 for res in image_res):
+        raise ValueError("All image_res values must be positive.")
+    image_res = np.array(image_res)  # Convert to numpy array
+
+    R = radius # mm
+    sus_diff = chi # ppm
 
     dicto = {'spherical': Spherical(matrix, image_res, R, sus_diff),
               'cylindrical': Cylindrical(matrix, image_res, R, sus_diff)}
@@ -321,3 +351,5 @@ def compare_to_analytical(geometry_type, buffer):
     # plot the results
     geometry.plot_susceptibility_and_fieldmap(sus_dist, calculated_Bz, geometry_type)
     geometry.plot_comparaison_analytical(Bz_analytical, calculated_Bz, geometry_type)
+
+    return calculated_Bz, Bz_analytical
