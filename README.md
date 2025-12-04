@@ -1,4 +1,7 @@
 # susceptibility-to-fieldmap-fft
+[![Build Status](https://github.com/shimming-toolbox/susceptibility-to-fieldmap-fft/actions/workflows/run_tests.yaml/badge.svg)](https://github.com/shimming-toolbox/susceptibility-to-fieldmap-fft/actions/workflows/run_tests.yaml)
+[![Coverage Status](https://coveralls.io/repos/github/shimming-toolbox/susceptibility-to-fieldmap-fft/badge.svg?branch=mb/31)](https://coveralls.io/github/shimming-toolbox/susceptibility-to-fieldmap-fft?branch=mb/31)
+
 
 # Table of contents
 1. [Theory](#theory)
