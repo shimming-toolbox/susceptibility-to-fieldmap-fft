@@ -91,6 +91,7 @@ class Visualization:
         axes[0].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), simulated_Bz[:, dimensions[0]//2, dimensions[0]//2],'--', label='Simulated')
         axes[0].set_xlabel('x position [mm]')
         axes[0].set_ylabel('Field variation [ppm]')
+
         axes[0].set_ylim(vmin, vmax)
         axes[0].legend()
 
@@ -109,6 +110,7 @@ class Visualization:
         axes[2].legend()
 
         plt.tight_layout()
+        plt.savefig(f'{geometry_type}_analytical_vs_simulated.png', dpi=300)
         plt.show()
 
 class Spherical(Visualization):
@@ -278,7 +280,7 @@ class Cylindrical(Visualization):
 @click.option('-t', '--geometry-type',required=True, 
               type=click.Choice(['spherical', 'cylindrical']), 
               help='Type of geometry for the simulation')
-@click.option('-b', '--buffer', default=2, 
+@click.option('-b', '--buffer', default=50, 
               help='Buffer value for zero-padding.')
 def compare_to_analytical(geometry_type, buffer, matrix=[128,128,128], image_res=[1,1,1], radius=15, chi=9):
     """
@@ -345,6 +347,7 @@ def compare_to_analytical_internal(geometry_type, buffer, matrix=[128,128,128], 
 
     # compute Bz variation
     calculated_Bz = compute_bz(sus_dist, image_res, buffer)
+
     # analytical solution
     Bz_analytical = geometry.analytical_sol()
 

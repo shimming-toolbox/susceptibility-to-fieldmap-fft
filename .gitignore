@@ -11,3 +11,5 @@ trash/
 .DS_Store
 *.nii.gz
 *.nii
+run.py
+tests.py

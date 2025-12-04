@@ -60,8 +60,13 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
     """
 
     # Pad the susceptibility distribution
-    susceptibility_distribution=np.pad(susceptibility_distribution, buffer, mode=mode)
-    
+
+    if mode == 'b0SimISMRM':
+            susceptibility_distribution=np.pad(susceptibility_distribution, ((buffer, buffer), (0,buffer), (buffer,buffer)), mode='edge')
+            susceptibility_distribution=np.pad(susceptibility_distribution, ((0,0),(buffer,0),(0,0)), mode='constant', constant_values=0.35)
+    else:
+        susceptibility_distribution=np.pad(susceptibility_distribution, buffer, mode=mode)
+
     # dimensions needs to be a numpy.array
     dimensions = np.array(susceptibility_distribution.shape)
 
@@ -69,24 +74,41 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
 
     interval = 2 * kmax / dimensions
 
-    [kx, ky, kz] = np.meshgrid(np.linspace(-kmax[0], kmax[0] - interval[0], dimensions[0]),
-                                np.linspace(-kmax[1], kmax[1]- interval[1], dimensions[1]),
-                                np.linspace(-kmax[2], kmax[2] - interval[2], dimensions[2]), indexing='ij')
+
+    kx_min_shift = (dimensions[0]%2)*interval[0]/2
+    ky_min_shift = (dimensions[1]%2)*interval[1]/2
+    kz_min_shift = (dimensions[2]%2)*interval[2]/2
+
+    kx_max_shift = -interval[0] + (dimensions[0]%2)*interval[0]/2
+    ky_max_shift = -interval[1] + (dimensions[1]%2)*interval[1]/2
+    kz_max_shift = -interval[2] + (dimensions[2]%2)*interval[2]/2 
+
+
+    [kx, ky, kz] = np.meshgrid(np.linspace(-kmax[0] + kx_min_shift, kmax[0] + kx_max_shift, dimensions[0]),
+                                np.linspace(-kmax[1] + ky_min_shift, kmax[1] + ky_max_shift, dimensions[1]),
+                                np.linspace(-kmax[2] + kz_min_shift, kmax[2] + kz_max_shift, dimensions[2]), indexing='ij')
 
     # FFT procedure
     # undetermined at the center of k-space
     k2 = kx**2 + ky**2 + kz**2
 
     with np.errstate(divide='ignore', invalid='ignore'):
-        kernel = np.fft.fftshift(1/3 - kz**2/k2)
-        kernel[0,0,0] = 1/3
+        x_kernel = 1/3 - kz**2/k2
+
+        x_kernel[int(dimensions[0]/2-1/2*(dimensions[0]%2)), int(dimensions[1]/2-1/2*(dimensions[1]%2)), int(dimensions[2]/2-1/2*(dimensions[2]%2))] = 1/3
+        
+        kernel = np.fft.fftshift(x_kernel)
 
     FFT_chi = np.fft.fftn(susceptibility_distribution, dimensions)
+
     FFT_chi[0,0,0] = FFT_chi[0,0,0] + np.prod(dimensions)*susceptibility_distribution[0,0,0]
+
     Bz_fft = kernel*FFT_chi
 
     # retrive the inital FOV
+
     volume_with_buffer = np.real(np.fft.ifftn(Bz_fft))
+
     volume_without_buffer = volume_with_buffer[buffer:-buffer, buffer:-buffer, buffer:-buffer]
 
     return volume_without_buffer
