@@ -9,3 +9,5 @@ build/
 data/
 trash/
 .DS_Store
+*.nii.gz
+*.nii
