@@ -1,5 +1,5 @@
 # susceptibility-to-fieldmap-fft
-[![Build Status](https://github.com/shimming-toolbox/susceptibility-to-fieldmap-fft/actions/workflows/run_tests.yaml/badge.svg?branch=mb/custom_pad)](https://github.com/shimming-toolbox/susceptibility-to-fieldmap-fft/actions/workflows/run_tests.yaml?branch=mb/custom_pad)
+[![Run tests](https://github.com/shimming-toolbox/susceptibility-to-fieldmap-fft/actions/workflows/run_tests.yml/badge.svg?branch=mb%2Fcustom_pad)](https://github.com/shimming-toolbox/susceptibility-to-fieldmap-fft/actions/workflows/run_tests.yml)
 [![Coverage Status](https://coveralls.io/repos/github/shimming-toolbox/susceptibility-to-fieldmap-fft/badge.svg?branch=mb/custom_pad)](https://coveralls.io/github/shimming-toolbox/susceptibility-to-fieldmap-fft?branch=mb/custom_pad)
 
 
