@@ -216,9 +216,9 @@ class Cylindrical(Visualization):
         """
         [x, y, z] = np.meshgrid(np.linspace(-(self.matrix[0]-1)/2, (self.matrix[0]-1)/2, self.matrix[0]),
                                 np.linspace(-(self.matrix[1]-1)/2, (self.matrix[1]-1)/2, self.matrix[1]),
-                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]))
+                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]), indexing='ij')
 
-        r = x**2 + y**2 
+        r = x**2 + y**2
 
         mask = r <= self.R**2
 
@@ -250,7 +250,7 @@ class Cylindrical(Visualization):
 
         [x, y, z] = np.meshgrid(np.linspace(-(self.matrix[0]-1)/2, (self.matrix[0]-1)/2, self.matrix[0]),
                                 np.linspace(-(self.matrix[1]-1)/2, (self.matrix[1]-1)/2, self.matrix[1]),
-                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]))
+                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]), indexing='ij')
 
         r = np.sqrt(x**2 + y**2 + z**2)
 
