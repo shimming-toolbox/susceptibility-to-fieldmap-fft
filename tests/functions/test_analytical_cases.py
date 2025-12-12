@@ -149,8 +149,7 @@ class TestCore(object):
         matrix=[128,128,128]
         compare_to_analytical_internal(geometry_type, buffer, matrix=matrix)
 
-    #@pytest.mark.integration
-    @pytest.mark.xfail
+    @pytest.mark.integration
     def test_compare_analytical_spherical_allodd_matrix(self):
         
         geometry_type='spherical'
