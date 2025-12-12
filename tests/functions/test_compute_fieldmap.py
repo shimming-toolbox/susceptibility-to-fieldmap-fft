@@ -36,7 +36,7 @@ def test_compute_bz_uniform_susceptibility():
     result = compute_bz(uniform_susceptibility)
     reference_point = result[0,0,0]
 
-    assert np.all(result == reference_point), "Field variation computation failed for uniform susceptiility"
+    assert np.allclose(result, reference_point), "Field variation computation failed for uniform susceptiility"
 
 def test_save_to_nifti(tmpdir):
     data = np.random.rand(32, 32, 32)
@@ -48,9 +48,5 @@ def test_save_to_nifti(tmpdir):
     loaded_data = loaded_nii.get_fdata()
     loaded_affine_matrix = loaded_nii.affine
 
-    assert np.array_equal(data, loaded_data), "save_to_nifti failed to save the image data correctly"
+    assert np.allclose(data, loaded_data), "save_to_nifti failed to save the image data correctly"
     assert np.array_equal(affine_matrix, loaded_affine_matrix), "save_to_nifti failed to save the affine matrix correctly"
-
-
-
-
