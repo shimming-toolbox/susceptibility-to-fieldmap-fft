@@ -205,10 +205,9 @@ class TestCore(object):
         matrix=[129,129,129]
         compare_to_analytical_internal(geometry_type, buffer, matrix=matrix)
 
-    #@pytest.mark.integration
-    @pytest.mark.xfail
+    @pytest.mark.integration
     def test_compare_analytical_spherical_mixed_pairity_matrix(self):
-        
+
         geometry_type='spherical'
         buffer=1
         matrix=[128,129,128]

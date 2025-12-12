@@ -95,15 +95,15 @@ class Visualization:
         axes[0].set_ylim(vmin, vmax)
         axes[0].legend()
 
-        axes[1].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), Bz_analytical[dimensions[0]//2, :, dimensions[0]//2], label='Theory')
-        axes[1].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), simulated_Bz[dimensions[0]//2, :, dimensions[0]//2],'--', label='Simulated')
+        axes[1].plot(np.linspace(-dimensions[1]//2, dimensions[1]//2, dimensions[1]), Bz_analytical[dimensions[0]//2, :, dimensions[2]//2], label='Theory')
+        axes[1].plot(np.linspace(-dimensions[1]//2, dimensions[1]//2, dimensions[1]), simulated_Bz[dimensions[0]//2, :, dimensions[2]//2],'--', label='Simulated')
         axes[1].set_xlabel('y position [mm]')
         axes[1].set_ylabel('Field variation [ppm]')
         axes[1].set_ylim(vmin, vmax)
         axes[1].legend()
 
-        axes[2].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), Bz_analytical[dimensions[0]//2, dimensions[0]//2, :], label='Theory')
-        axes[2].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), simulated_Bz[dimensions[0]//2, dimensions[0]//2, :],'--', label='Simulated')
+        axes[2].plot(np.linspace(-dimensions[2]//2, dimensions[2]//2, dimensions[2]), Bz_analytical[dimensions[0]//2, dimensions[1]//2, :], label='Theory')
+        axes[2].plot(np.linspace(-dimensions[2]//2, dimensions[2]//2, dimensions[2]), simulated_Bz[dimensions[0]//2, dimensions[1]//2, :],'--', label='Simulated')
         axes[2].set_xlabel('z position [mm]')
         axes[2].set_ylabel('Field variation [ppm]')
         axes[2].set_ylim(vmin, vmax)
@@ -145,7 +145,7 @@ class Spherical(Visualization):
         """
         [x, y, z] = np.meshgrid(np.linspace(-(self.matrix[0]-1)/2, (self.matrix[0]-1)/2, self.matrix[0]),
                                 np.linspace(-(self.matrix[1]-1)/2, (self.matrix[1]-1)/2, self.matrix[1]),
-                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]))
+                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]), indexing='ij')
 
         r = np.sqrt(x**2 + y**2 + z**2)
 
@@ -171,7 +171,7 @@ class Spherical(Visualization):
 
         [x, y, z] = np.meshgrid(np.linspace(-(self.matrix[0]-1)/2, (self.matrix[0]-1)/2, self.matrix[0]),
                                 np.linspace(-(self.matrix[1]-1)/2, (self.matrix[1]-1)/2, self.matrix[1]),
-                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]))
+                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]), indexing='ij')
 
 
         r = np.sqrt(x**2 + y**2 + z**2)

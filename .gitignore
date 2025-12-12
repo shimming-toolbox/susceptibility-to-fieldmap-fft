@@ -13,3 +13,4 @@ trash/
 *.nii
 run.py
 tests.py
+spherical_analytical_vs_simulated.png
