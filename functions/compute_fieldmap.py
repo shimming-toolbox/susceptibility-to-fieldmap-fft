@@ -109,7 +109,10 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
 
     volume_with_buffer = np.real(np.fft.ifftn(Bz_fft))
 
-    volume_without_buffer = volume_with_buffer[buffer:-buffer, buffer:-buffer, buffer:-buffer]
+    if buffer == 0:
+        volume_without_buffer = volume_with_buffer
+    else:
+        volume_without_buffer = volume_with_buffer[buffer:-buffer, buffer:-buffer, buffer:-buffer]
 
     return volume_without_buffer
 

@@ -155,16 +155,14 @@ class TestCore(object):
         assert calculated_Bz.shape == DEFAULT_MATRIX
         assert Bz_analytical.shape == DEFAULT_MATRIX
         
-    #@pytest.mark.integration
-    @pytest.mark.xfail
+    @pytest.mark.integration
     def test_compare_analytical_spherical_zero_buffer(self):
-        
+
         geometry_type='spherical'
         buffer=0
         compare_to_analytical_internal(geometry_type, buffer=buffer)
 
-    #@pytest.mark.integration
-    @pytest.mark.xfail
+    @pytest.mark.integration
     def test_compare_analytical_spherical_zero_buffer_expected_matrix(self):
         
         geometry_type='spherical'
