@@ -1,4 +1,5 @@
 from functions.compute_fieldmap import is_nifti, load_sus_dist, save_to_nifti, compute_bz
+from functions.analytical_cases import analytical_sphere_external_field
 import numpy as np
 import nibabel as nib
 import os
@@ -96,3 +97,81 @@ def test_compute_bz_single_water_voxel_odd_matrix():
 
     assert np.isclose(result[0, 0, 0], expected_value, atol=0.01), \
         f"Field at corner [0,0,0] should be {expected_value} ppm, got {result[0, 0, 0]} ppm"
+
+def test_compute_bz_single_water_voxel_neighbors_vs_analytical_even():
+    """Test neighboring voxels match analytical spherical field for even matrix."""
+    # Create all-air volume
+    chi_air = 0.35  # ppm (external)
+    chi_water = -9.0  # ppm (internal)
+    susceptibility = np.ones((128, 128, 128)) * chi_air
+
+    # Set center voxel to water (modeling as small sphere)
+    center_idx = 63
+    susceptibility[center_idx, center_idx, center_idx] = chi_water
+
+    # Compute field
+    result = compute_bz(susceptibility, buffer=10)
+
+    # Effective radius for single cubic voxel
+    radius = 0.6  # voxels
+
+    # Test neighboring voxels in cardinal directions
+    # Neighbors are at distance=1 from the water voxel
+    neighbors = [
+        (64, 63, 63, 1, 0, 0, '+x'),  # +x neighbor
+        (62, 63, 63, -1, 0, 0, '-x'),  # -x neighbor
+        (63, 64, 63, 0, 1, 0, '+y'),  # +y neighbor
+        (63, 62, 63, 0, -1, 0, '-y'),  # -y neighbor
+        (63, 63, 64, 0, 0, 1, '+z'),  # +z neighbor
+        (63, 63, 62, 0, 0, -1, '-z'),  # -z neighbor
+    ]
+
+    for i, j, k, dx, dy, dz, direction in neighbors:
+        # Calculate analytical expectation
+        expected = analytical_sphere_external_field(dx, dy, dz, chi_water, chi_air, radius)
+
+        # Get computed value
+        computed = result[i, j, k]
+
+        # Tolerance accounts for discretization effects
+        assert np.isclose(computed, expected, atol=0.05), \
+            f"Neighbor in {direction} direction [{i},{j},{k}]: expected {expected:.4f} ppm, got {computed:.4f} ppm"
+
+def test_compute_bz_single_water_voxel_neighbors_vs_analytical_odd():
+    """Test neighboring voxels match analytical spherical field for odd matrix."""
+    # Create all-air volume
+    chi_air = 0.35  # ppm (external)
+    chi_water = -9.0  # ppm (internal)
+    susceptibility = np.ones((129, 129, 129)) * chi_air
+
+    # Set center voxel to water
+    center_idx = 64
+    susceptibility[center_idx, center_idx, center_idx] = chi_water
+
+    # Compute field
+    result = compute_bz(susceptibility, buffer=10)
+
+    # Effective radius for single cubic voxel
+    radius = 0.6  # voxels
+
+    # Test neighboring voxels in cardinal directions
+    # Neighbors are at distance=1 from the water voxel
+    neighbors = [
+        (65, 64, 64, 1, 0, 0, '+x'),  # +x neighbor
+        (63, 64, 64, -1, 0, 0, '-x'),  # -x neighbor
+        (64, 65, 64, 0, 1, 0, '+y'),  # +y neighbor
+        (64, 63, 64, 0, -1, 0, '-y'),  # -y neighbor
+        (64, 64, 65, 0, 0, 1, '+z'),  # +z neighbor
+        (64, 64, 63, 0, 0, -1, '-z'),  # -z neighbor
+    ]
+
+    for i, j, k, dx, dy, dz, direction in neighbors:
+        # Calculate analytical expectation
+        expected = analytical_sphere_external_field(dx, dy, dz, chi_water, chi_air, radius)
+
+        # Get computed value
+        computed = result[i, j, k]
+
+        # Tolerance accounts for discretization effects
+        assert np.isclose(computed, expected, atol=0.05), \
+            f"Neighbor in {direction} direction [{i},{j},{k}]: expected {expected:.4f} ppm, got {computed:.4f} ppm"

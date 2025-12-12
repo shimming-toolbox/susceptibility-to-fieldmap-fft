@@ -276,6 +276,35 @@ class Cylindrical(Visualization):
 
         return Bz_analytical
     
+def analytical_sphere_external_field(dx, dy, dz, chi_internal, chi_external, radius):
+    """
+    Calculate analytical external field for a sphere at relative position (dx, dy, dz).
+
+    Formula: Bz/B0 = 1/3 * (chi_i - chi_e) * a^3/r^3 * (3*cos^2(theta) - 1) + 1/3 * chi_e
+
+    Args:
+        dx, dy, dz: Position relative to sphere center (in voxels)
+        chi_internal: Susceptibility inside sphere (ppm)
+        chi_external: Susceptibility outside sphere (ppm)
+        radius: Sphere radius (in voxels)
+
+    Returns:
+        Field value at position (dx, dy, dz) in ppm
+    """
+    r = np.sqrt(dx**2 + dy**2 + dz**2)
+
+    if r == 0:
+        # At center
+        return chi_external / 3.0
+
+    # cos(theta) where theta is angle from z-axis
+    cos_theta = dz / r
+
+    # External field formula
+    field = (1.0/3.0) * (chi_internal - chi_external) * (radius**3 / r**3) * (3 * cos_theta**2 - 1) + chi_external / 3.0
+
+    return field
+
 @click.command(help="Compare the analytical solution to the simulated solution for a spherical or cylindrical geometry.")
 @click.option('-t', '--geometry-type',required=True, 
               type=click.Choice(['spherical', 'cylindrical']), 
