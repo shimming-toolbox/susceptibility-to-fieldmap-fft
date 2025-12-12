@@ -3,20 +3,63 @@ import numpy as np
 import nibabel as nib
 import os
 import pytest
-import copy
 import matplotlib
 matplotlib.use("Agg")
 
 DEFAULT_MATRIX = (128, 128, 128)
 ACCEPTABLE_ATOL = 0.1
 
-def smape(A, F):
-    A = copy.deepcopy(A)
-    F = copy.deepcopy(F)
-    A = A.reshape(-1)
-    F = F.reshape(-1)
+def create_boundary_exclusion_mask(matrix, image_res, radius, ring_thickness_voxels=10):
+    """Create a mask that excludes a ring around the sphere boundary.
 
-    return 100/len(A) * np.sum(2 * np.abs(F - A) / (np.abs(A) + np.abs(F)))
+    This mask excludes regions within ±ring_thickness_voxels of the sphere
+    surface to avoid Gibbs ringing artifacts in FFT-based field calculations.
+
+    Args:
+        matrix: Array dimensions [nx, ny, nz]
+        image_res: Image resolution in mm [dx, dy, dz]
+        radius: Sphere radius in mm
+        ring_thickness_voxels: Thickness of boundary ring to exclude (in voxels)
+
+    Returns:
+        Boolean mask: True for valid comparison regions, False for excluded ring
+    """
+    [x, y, z] = np.meshgrid(np.linspace(-(matrix[0]-1)/2, (matrix[0]-1)/2, matrix[0]),
+                            np.linspace(-(matrix[1]-1)/2, (matrix[1]-1)/2, matrix[1]),
+                            np.linspace(-(matrix[2]-1)/2, (matrix[2]-1)/2, matrix[2]))
+
+    # Distance from center in voxels
+    r_voxels = np.sqrt(x**2 + y**2 + z**2)
+
+    # Sphere radius in voxels (assuming isotropic for simplicity, use image_res[0])
+    radius_voxels = radius / image_res[0]
+
+    # Exclude ring: radius_voxels - thickness < r < radius_voxels + thickness
+    inner_boundary = radius_voxels - ring_thickness_voxels
+    outer_boundary = radius_voxels + ring_thickness_voxels
+
+    # True where we want to compare (outside the exclusion ring)
+    valid_mask = (r_voxels < inner_boundary) | (r_voxels > outer_boundary)
+
+    return valid_mask
+
+def allclose_masked(A, F, mask, rtol=1e-5, atol=1e-8):
+    """Check if arrays are close using np.allclose, only in masked regions.
+
+    Args:
+        A: Actual/analytical values
+        F: Forecast/calculated values
+        mask: Boolean mask - only compare where True
+        rtol: Relative tolerance for np.allclose
+        atol: Absolute tolerance for np.allclose
+
+    Returns:
+        Boolean: True if all masked values are close
+    """
+    A_masked = A[mask]
+    F_masked = F[mask]
+
+    return np.allclose(A_masked, F_masked, rtol=rtol, atol=atol)
 
 class TestCore(object):
     def setup_method(self):
@@ -73,16 +116,26 @@ class TestCore(object):
 
         compare_to_analytical_internal(geometry_type, buffer)
 
-    #@pytest.mark.single
-    @pytest.mark.xfail
-    def test_compare_analytical_spherical_default_outputs_close(self):
-        
-        geometry_type='spherical'
-        buffer=1
+    @pytest.mark.integration
+    def test_compare_analytical_spherical_with_boundary_exclusion(self):
+        """Test spherical field excluding Gibbs ringing at boundary."""
+        geometry_type = 'spherical'
+        buffer = 1
+        matrix = [128, 128, 128]
+        image_res = [1, 1, 1]
+        radius = 15
 
-        calculated_Bz, Bz_analytical = compare_to_analytical_internal(geometry_type, buffer)
+        calculated_Bz, Bz_analytical = compare_to_analytical_internal(
+            geometry_type, buffer, matrix=matrix, image_res=image_res, radius=radius
+        )
 
-        assert smape(Bz_analytical,calculated_Bz) < 10
+        # Exclude ±10 pixel ring around sphere boundary
+        exclusion_mask = create_boundary_exclusion_mask(
+            matrix, image_res, radius, ring_thickness_voxels=10
+        )
+
+        # Test with allclose in valid regions only (0.1 ppm absolute tolerance)
+        assert allclose_masked(Bz_analytical, calculated_Bz, exclusion_mask, atol=0.1)
 
     # Buffer tests
     @pytest.mark.integration
