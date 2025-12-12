@@ -182,14 +182,11 @@ class TestCore(object):
         assert calculated_Bz.shape == DEFAULT_MATRIX
         assert Bz_analytical.shape == DEFAULT_MATRIX
 
-    # This next test currently gets killed from a memory error
-    #@pytest.mark.integration
-    @pytest.mark.xfail
-    def test_compare_analytical_spherical_64px_buffer(self):
-        assert False    
-    #    geometry_type='spherical'
-    #    buffer=64
-    #    compare_to_analytical_internal(geometry_type, buffer=buffer)
+    @pytest.mark.integration
+    def test_compare_analytical_spherical_50px_buffer(self):
+        geometry_type='spherical'
+        buffer=50
+        compare_to_analytical_internal(geometry_type, buffer=buffer)
 
     # Matrix tests
     @pytest.mark.integration
