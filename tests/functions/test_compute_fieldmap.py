@@ -50,3 +50,49 @@ def test_save_to_nifti(tmpdir):
 
     assert np.allclose(data, loaded_data), "save_to_nifti failed to save the image data correctly"
     assert np.array_equal(affine_matrix, loaded_affine_matrix), "save_to_nifti failed to save the affine matrix correctly"
+
+def test_compute_bz_single_water_voxel_even_matrix():
+    """Test single water voxel in air for even-sized matrix [128,128,128]."""
+    # Create all-air volume
+    chi_air = 0.35  # ppm
+    susceptibility = np.ones((128, 128, 128)) * chi_air
+
+    # Set center voxel to water
+    chi_water = -9.0  # ppm
+    susceptibility[63, 63, 63] = chi_water
+
+    # Compute field
+    result = compute_bz(susceptibility, buffer=10)
+
+    # Expected: field everywhere should be 1/3 * chi_air
+    # (the dominant contribution comes from the uniform air background)
+    expected_value = chi_air / 3.0
+
+    assert np.isclose(result[63, 63, 63], expected_value, atol=0.01), \
+        f"Field at center voxel should be {expected_value} ppm, got {result[63, 63, 63]} ppm"
+
+    assert np.isclose(result[0, 0, 0], expected_value, atol=0.01), \
+        f"Field at corner [0,0,0] should be {expected_value} ppm, got {result[0, 0, 0]} ppm"
+
+def test_compute_bz_single_water_voxel_odd_matrix():
+    """Test single water voxel in air for odd-sized matrix [129,129,129]."""
+    # Create all-air volume
+    chi_air = 0.35  # ppm
+    susceptibility = np.ones((129, 129, 129)) * chi_air
+
+    # Set center voxel to water
+    chi_water = -9.0  # ppm
+    susceptibility[64, 64, 64] = chi_water
+
+    # Compute field
+    result = compute_bz(susceptibility, buffer=10)
+
+    # Expected: field everywhere should be 1/3 * chi_air
+    # (the dominant contribution comes from the uniform air background)
+    expected_value = chi_air / 3.0
+
+    assert np.isclose(result[64, 64, 64], expected_value, atol=0.01), \
+        f"Field at center voxel should be {expected_value} ppm, got {result[64, 64, 64]} ppm"
+
+    assert np.isclose(result[0, 0, 0], expected_value, atol=0.01), \
+        f"Field at corner [0,0,0] should be {expected_value} ppm, got {result[0, 0, 0]} ppm"
