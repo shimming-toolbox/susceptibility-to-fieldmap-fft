@@ -290,8 +290,177 @@ class TestCore(object):
 
     @pytest.mark.integration
     def test_compare_analytical_spherical_decimal_chi(self):
-        
+
         geometry_type='spherical'
+        buffer=1
+        chi=9.5
+        compare_to_analytical_internal(geometry_type, buffer, chi=chi)
+
+    # --------------Cylindrical geometry tests-------------- #
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_default_args(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+
+        compare_to_analytical_internal(geometry_type, buffer)
+
+    # Buffer tests
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_default_buffer(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        compare_to_analytical_internal(geometry_type, buffer=buffer)
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_default_buffer_expected_matrix_shape(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        calculated_Bz, Bz_analytical = compare_to_analytical_internal(geometry_type, buffer=buffer)
+
+        assert calculated_Bz.shape == DEFAULT_MATRIX
+        assert Bz_analytical.shape == DEFAULT_MATRIX
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_zero_buffer(self):
+
+        geometry_type='cylindrical'
+        buffer=0
+        compare_to_analytical_internal(geometry_type, buffer=buffer)
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_zero_buffer_expected_matrix(self):
+
+        geometry_type='cylindrical'
+        buffer=0
+        calculated_Bz, Bz_analytical = compare_to_analytical_internal(geometry_type, buffer=buffer)
+
+        assert calculated_Bz.shape == DEFAULT_MATRIX
+        assert Bz_analytical.shape == DEFAULT_MATRIX
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_twopix_buffer(self):
+
+        geometry_type='cylindrical'
+        buffer=2
+        calculated_Bz, Bz_analytical = compare_to_analytical_internal(geometry_type, buffer=buffer)
+
+        assert calculated_Bz.shape == DEFAULT_MATRIX
+        assert Bz_analytical.shape == DEFAULT_MATRIX
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_50px_buffer(self):
+        geometry_type='cylindrical'
+        buffer=50
+        compare_to_analytical_internal(geometry_type, buffer=buffer)
+
+    # Matrix tests
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_alleven_matrix(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        matrix=[128,128,128]
+        compare_to_analytical_internal(geometry_type, buffer, matrix=matrix)
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_allodd_matrix(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        matrix=[129,129,129]
+        compare_to_analytical_internal(geometry_type, buffer, matrix=matrix)
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_mixed_pairity_matrix(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        matrix=[128,129,128]
+        compare_to_analytical_internal(geometry_type, buffer, matrix=matrix)
+
+    # Image res tests
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_allodd_image_res(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        image_res=[1,1,1]
+        compare_to_analytical_internal(geometry_type, buffer, image_res=image_res)
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_alleven_image_res(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        image_res=[2,2,2]
+        compare_to_analytical_internal(geometry_type, buffer, image_res=image_res)
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_anisotropic_image_res(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        image_res=[1,1,2]
+        compare_to_analytical_internal(geometry_type, buffer, image_res=image_res)
+
+    # Radius tests
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_default_radius(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        radius=15
+        compare_to_analytical_internal(geometry_type, buffer, radius=radius)
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_small_radius(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        radius=1
+        compare_to_analytical_internal(geometry_type, buffer, radius=radius)
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_large_radius(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        radius=128
+        compare_to_analytical_internal(geometry_type, buffer, radius=radius)
+
+    # Chi tests
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_default_chi(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        chi=9
+        compare_to_analytical_internal(geometry_type, buffer, chi=chi)
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_negative_chi(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        chi=-9
+        compare_to_analytical_internal(geometry_type, buffer, chi=chi)
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_zero_chi(self):
+
+        geometry_type='cylindrical'
+        buffer=1
+        chi=0
+        compare_to_analytical_internal(geometry_type, buffer, chi=chi)
+
+    @pytest.mark.integration
+    def test_compare_analytical_cylindrical_decimal_chi(self):
+
+        geometry_type='cylindrical'
         buffer=1
         chi=9.5
         compare_to_analytical_internal(geometry_type, buffer, chi=chi)
