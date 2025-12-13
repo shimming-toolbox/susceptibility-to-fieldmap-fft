@@ -6,3 +6,12 @@
 .ipynb_checkpoints/
 .vscode/
 build/
+data/
+trash/
+.DS_Store
+*.nii.gz
+*.nii
+run.py
+tests.py
+spherical_analytical_vs_simulated.png
+cylindrical_analytical_vs_simulated.png

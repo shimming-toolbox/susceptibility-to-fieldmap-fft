@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.ndimage import rotate
 import click
+import copy
 
 class Visualization:
     """
@@ -90,24 +91,26 @@ class Visualization:
         axes[0].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), simulated_Bz[:, dimensions[0]//2, dimensions[0]//2],'--', label='Simulated')
         axes[0].set_xlabel('x position [mm]')
         axes[0].set_ylabel('Field variation [ppm]')
+
         axes[0].set_ylim(vmin, vmax)
         axes[0].legend()
 
-        axes[1].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), Bz_analytical[dimensions[0]//2, :, dimensions[0]//2], label='Theory')
-        axes[1].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), simulated_Bz[dimensions[0]//2, :, dimensions[0]//2],'--', label='Simulated')
+        axes[1].plot(np.linspace(-dimensions[1]//2, dimensions[1]//2, dimensions[1]), Bz_analytical[dimensions[0]//2, :, dimensions[2]//2], label='Theory')
+        axes[1].plot(np.linspace(-dimensions[1]//2, dimensions[1]//2, dimensions[1]), simulated_Bz[dimensions[0]//2, :, dimensions[2]//2],'--', label='Simulated')
         axes[1].set_xlabel('y position [mm]')
         axes[1].set_ylabel('Field variation [ppm]')
         axes[1].set_ylim(vmin, vmax)
         axes[1].legend()
 
-        axes[2].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), Bz_analytical[dimensions[0]//2, dimensions[0]//2, :], label='Theory')
-        axes[2].plot(np.linspace(-dimensions[0]//2, dimensions[0]//2, dimensions[0]), simulated_Bz[dimensions[0]//2, dimensions[0]//2, :],'--', label='Simulated')
+        axes[2].plot(np.linspace(-dimensions[2]//2, dimensions[2]//2, dimensions[2]), Bz_analytical[dimensions[0]//2, dimensions[1]//2, :], label='Theory')
+        axes[2].plot(np.linspace(-dimensions[2]//2, dimensions[2]//2, dimensions[2]), simulated_Bz[dimensions[0]//2, dimensions[1]//2, :],'--', label='Simulated')
         axes[2].set_xlabel('z position [mm]')
         axes[2].set_ylabel('Field variation [ppm]')
         axes[2].set_ylim(vmin, vmax)
         axes[2].legend()
 
         plt.tight_layout()
+        plt.savefig(f'{geometry_type}_analytical_vs_simulated.png', dpi=300)
         plt.show()
 
 class Spherical(Visualization):
@@ -142,7 +145,7 @@ class Spherical(Visualization):
         """
         [x, y, z] = np.meshgrid(np.linspace(-(self.matrix[0]-1)/2, (self.matrix[0]-1)/2, self.matrix[0]),
                                 np.linspace(-(self.matrix[1]-1)/2, (self.matrix[1]-1)/2, self.matrix[1]),
-                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]))
+                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]), indexing='ij')
 
         r = np.sqrt(x**2 + y**2 + z**2)
 
@@ -168,7 +171,7 @@ class Spherical(Visualization):
 
         [x, y, z] = np.meshgrid(np.linspace(-(self.matrix[0]-1)/2, (self.matrix[0]-1)/2, self.matrix[0]),
                                 np.linspace(-(self.matrix[1]-1)/2, (self.matrix[1]-1)/2, self.matrix[1]),
-                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]))
+                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]), indexing='ij')
 
 
         r = np.sqrt(x**2 + y**2 + z**2)
@@ -213,9 +216,9 @@ class Cylindrical(Visualization):
         """
         [x, y, z] = np.meshgrid(np.linspace(-(self.matrix[0]-1)/2, (self.matrix[0]-1)/2, self.matrix[0]),
                                 np.linspace(-(self.matrix[1]-1)/2, (self.matrix[1]-1)/2, self.matrix[1]),
-                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]))
+                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]), indexing='ij')
 
-        r = x**2 + y**2 
+        r = x**2 + y**2
 
         mask = r <= self.R**2
 
@@ -247,7 +250,7 @@ class Cylindrical(Visualization):
 
         [x, y, z] = np.meshgrid(np.linspace(-(self.matrix[0]-1)/2, (self.matrix[0]-1)/2, self.matrix[0]),
                                 np.linspace(-(self.matrix[1]-1)/2, (self.matrix[1]-1)/2, self.matrix[1]),
-                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]))
+                                np.linspace(-(self.matrix[2]-1)/2, (self.matrix[2]-1)/2, self.matrix[2]), indexing='ij')
 
         r = np.sqrt(x**2 + y**2 + z**2)
 
@@ -273,19 +276,52 @@ class Cylindrical(Visualization):
 
         return Bz_analytical
     
+def analytical_sphere_external_field(dx, dy, dz, chi_internal, chi_external, radius):
+    """
+    Calculate analytical external field for a sphere at relative position (dx, dy, dz).
+
+    Formula: Bz/B0 = 1/3 * (chi_i - chi_e) * a^3/r^3 * (3*cos^2(theta) - 1) + 1/3 * chi_e
+
+    Args:
+        dx, dy, dz: Position relative to sphere center (in voxels)
+        chi_internal: Susceptibility inside sphere (ppm)
+        chi_external: Susceptibility outside sphere (ppm)
+        radius: Sphere radius (in voxels)
+
+    Returns:
+        Field value at position (dx, dy, dz) in ppm
+    """
+    r = np.sqrt(dx**2 + dy**2 + dz**2)
+
+    if r == 0:
+        # At center
+        return chi_external / 3.0
+
+    # cos(theta) where theta is angle from z-axis
+    cos_theta = dz / r
+
+    # External field formula
+    field = (1.0/3.0) * (chi_internal - chi_external) * (radius**3 / r**3) * (3 * cos_theta**2 - 1) + chi_external / 3.0
+
+    return field
+
 @click.command(help="Compare the analytical solution to the simulated solution for a spherical or cylindrical geometry.")
 @click.option('-t', '--geometry-type',required=True, 
               type=click.Choice(['spherical', 'cylindrical']), 
               help='Type of geometry for the simulation')
-@click.option('-b', '--buffer', default=2, 
+@click.option('-b', '--buffer', default=50, 
               help='Buffer value for zero-padding.')
-def compare_to_analytical(geometry_type, buffer):
+def compare_to_analytical(geometry_type, buffer, matrix=[128,128,128], image_res=[1,1,1], radius=15, chi=9):
     """
     Main function to compare simulated fields to analytical solutions.
 
     Parameters:
     - geometry_type (str): The type of geometry to simulate ('spherical' or 'cylindrical').
     - buffer (float): The buffer size for the simulation.
+    - matrix ([int, int, int]): Volume dimensions in terms of number of pixels.
+    - image_res ([float, float, float]): Image resolution in mm ([x,y,z]).
+    - radius (float): Radius (mm) of the geometrical object.
+    - chi (float): Susceptibility difference in ppm.
 
     Returns:
     - None
@@ -301,10 +337,35 @@ def compare_to_analytical(geometry_type, buffer):
             and a susceptibility difference of 9 ppm for the spherical and cylindrical geometries.
     """
 
-    matrix = np.array([128,128,128])
-    image_res = np.array([1,1,1]) # mm
-    R = 15 # mm
-    sus_diff = 9 # ppm
+    compare_to_analytical_internal(geometry_type, buffer, matrix, image_res, radius, chi)
+
+
+def compare_to_analytical_internal(geometry_type, buffer, matrix=[128,128,128], image_res=[1,1,1], radius=15, chi=9):
+
+    # Type check the matrix argument
+    if not isinstance(matrix, (list, tuple, np.ndarray)):
+        raise TypeError("matrix must be a list, tuple, or numpy array.")
+    if len(matrix) != 3:
+        raise ValueError("matrix must have 3 elements (x, y, z dimensions).")
+    if not all(isinstance(dim, int) for dim in matrix):
+        raise TypeError("All elements of matrix must be integers.")
+    if not all(dim > 0 for dim in matrix):
+        raise ValueError("All matrix dimensions must be positive.")
+    matrix = np.array(matrix) # Convert to numpy array for easier use later
+
+    # Type check the image_res argument
+    if not isinstance(image_res, (list, tuple, np.ndarray)):
+        raise TypeError("image_res must be a list, tuple, or numpy array.")
+    if len(image_res) != 3:
+        raise ValueError("image_res must have 3 elements (x, y, z resolutions).")
+    if not all(isinstance(res, (int, float)) for res in image_res):
+        raise TypeError("All elements of image_res must be numbers (int or float).")
+    if not all(res > 0 for res in image_res):
+        raise ValueError("All image_res values must be positive.")
+    image_res = np.array(image_res)  # Convert to numpy array
+
+    R = radius # mm
+    sus_diff = chi # ppm
 
     dicto = {'spherical': Spherical(matrix, image_res, R, sus_diff),
               'cylindrical': Cylindrical(matrix, image_res, R, sus_diff)}
@@ -315,9 +376,12 @@ def compare_to_analytical(geometry_type, buffer):
 
     # compute Bz variation
     calculated_Bz = compute_bz(sus_dist, image_res, buffer)
+
     # analytical solution
     Bz_analytical = geometry.analytical_sol()
 
     # plot the results
     geometry.plot_susceptibility_and_fieldmap(sus_dist, calculated_Bz, geometry_type)
     geometry.plot_comparaison_analytical(Bz_analytical, calculated_Bz, geometry_type)
+
+    return calculated_Bz, Bz_analytical

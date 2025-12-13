@@ -2,6 +2,7 @@ import numpy as np
 import nibabel as nib
 import click
 from time import perf_counter
+from pathlib import Path
 
 def is_nifti(filepath):
     """
@@ -39,7 +40,7 @@ def load_sus_dist(filepath):
     return susceptibility_distribution, image_resolution, affine_matrix
 
 
-def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), buffer=1):
+def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), buffer=50, mode='edge'):
     """
     Compute the Bz field variation in ppm based on a susceptibility distribution
     using a Fourier-based method.
@@ -49,39 +50,67 @@ def compute_bz(susceptibility_distribution, image_resolution=np.array([1,1,1]), 
 
         image_resolution (numpy.ndarray, optional): The resolution of the image in each dimension. Defaults to [1, 1, 1].
 
-        buffer (int, optional): The buffer size for the k-space grid. Defaults to 1.
+        buffer (int, optional): The buffer size (voxels) for the k-space grid on each size. Defaults to 50.
+
+        mode (str, optional): The padding mode for the susceptibility distribution. Defaults to 'edge'.
 
     Returns:
         volume_without_buffer (numpy.ndarray): The computed magnetic field Bz in ppm.
 
     """
 
+    # Pad the susceptibility distribution
+
+    if mode == 'b0SimISMRM':
+            susceptibility_distribution=np.pad(susceptibility_distribution, ((buffer, buffer), (0,buffer), (buffer,buffer)), mode='edge')
+            susceptibility_distribution=np.pad(susceptibility_distribution, ((0,0),(buffer,0),(0,0)), mode='constant', constant_values=0.35)
+    else:
+        susceptibility_distribution=np.pad(susceptibility_distribution, buffer, mode=mode)
+
     # dimensions needs to be a numpy.array
     dimensions = np.array(susceptibility_distribution.shape)
 
-    # creating the k-space grid with the buffer
-    new_dimensions = buffer*np.array(dimensions)
     kmax = 1/(2*image_resolution)
 
-    [kx, ky, kz] = np.meshgrid(np.linspace(-kmax[0], kmax[0], new_dimensions[0]),
-                                np.linspace(-kmax[1], kmax[1], new_dimensions[1]),
-                                np.linspace(-kmax[2], kmax[2], new_dimensions[2]), indexing='ij')
+    interval = 2 * kmax / dimensions
+
+
+    kx_min_shift = (dimensions[0]%2)*interval[0]/2
+    ky_min_shift = (dimensions[1]%2)*interval[1]/2
+    kz_min_shift = (dimensions[2]%2)*interval[2]/2
+
+    kx_max_shift = -interval[0] + (dimensions[0]%2)*interval[0]/2
+    ky_max_shift = -interval[1] + (dimensions[1]%2)*interval[1]/2
+    kz_max_shift = -interval[2] + (dimensions[2]%2)*interval[2]/2 
+
+
+    [kx, ky, kz] = np.meshgrid(np.linspace(-kmax[0] + kx_min_shift, kmax[0] + kx_max_shift, dimensions[0]),
+                                np.linspace(-kmax[1] + ky_min_shift, kmax[1] + ky_max_shift, dimensions[1]),
+                                np.linspace(-kmax[2] + kz_min_shift, kmax[2] + kz_max_shift, dimensions[2]), indexing='ij')
 
     # FFT procedure
     # undetermined at the center of k-space
     k2 = kx**2 + ky**2 + kz**2
 
     with np.errstate(divide='ignore', invalid='ignore'):
-        kernel = np.fft.fftshift(1/3 - kz**2/k2)
-        kernel[0,0,0] = 1/3
+        x_kernel = 1/3 - kz**2/k2
 
-    FFT_chi = np.fft.fftn(susceptibility_distribution, new_dimensions)
-    FFT_chi[0,0,0] = FFT_chi[0,0,0] + np.prod(new_dimensions)*susceptibility_distribution[0,0,0]
+        x_kernel[int(dimensions[0]/2-1/2*(dimensions[0]%2)), int(dimensions[1]/2-1/2*(dimensions[1]%2)), int(dimensions[2]/2-1/2*(dimensions[2]%2))] = 1/3
+        
+        kernel = np.fft.ifftshift(x_kernel)
+
+    FFT_chi = np.fft.fftn(susceptibility_distribution, dimensions)
+
     Bz_fft = kernel*FFT_chi
 
     # retrive the inital FOV
+
     volume_with_buffer = np.real(np.fft.ifftn(Bz_fft))
-    volume_without_buffer = volume_with_buffer[0:dimensions[0], 0:dimensions[1], 0:dimensions[2]]
+
+    if buffer == 0:
+        volume_without_buffer = volume_with_buffer
+    else:
+        volume_without_buffer = volume_with_buffer[buffer:-buffer, buffer:-buffer, buffer:-buffer]
 
     return volume_without_buffer
 
@@ -97,6 +126,7 @@ def save_to_nifti(data, affine_matrix, output_path):
     Returns:
         None
     """
+    data=data.astype(np.float32)
     nifti_image = nib.Nifti1Image(data, affine_matrix)
     nib.save(nifti_image, output_path)
 
@@ -107,7 +137,11 @@ def save_to_nifti(data, affine_matrix, output_path):
               help="Input susceptibility distribution, supported extensions: .nii, .nii.gz")
 @click.option('-o', '--output', 'output_file', type=click.Path(), default='fieldmap.nii.gz',
               help="Output fieldmap, supported extensions: .nii, .nii.gz")
-def compute_fieldmap(input_file, output_file):
+@click.option('-b', '--buffer', 'buffer', type=int, default=50, required=False,
+                help="Buffer size (voxels) for the k-space grid on each side")
+@click.option('-m', '--mode', 'mode', type=str, default='edge', required=False,
+                help="Padding mode for the susceptibility distribution")
+def compute_fieldmap(input_file, output_file, buffer, mode):
     """
     Main procedure for performing the simulation.
 
@@ -123,8 +157,13 @@ def compute_fieldmap(input_file, output_file):
         print('Start')
         susceptibility_distribution, image_resolution, affine_matrix = load_sus_dist(input_file)
         print('Susceptibility distribution loaded')
-        fieldmap = compute_bz(susceptibility_distribution, image_resolution)
+        fieldmap = compute_bz(susceptibility_distribution, image_resolution, buffer, mode)
         print('Fieldmap simulated')
+        
+        # Check if all subdirectories exist and create them if not
+        output_path = Path(output_file)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        
         save_to_nifti(fieldmap, affine_matrix, output_file)
         print('Saving to NIfTI format')
         end_time = perf_counter()

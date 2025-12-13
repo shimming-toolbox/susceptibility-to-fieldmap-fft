@@ -1,4 +1,7 @@
 # susceptibility-to-fieldmap-fft
+[![Run tests](https://github.com/shimming-toolbox/susceptibility-to-fieldmap-fft/actions/workflows/run_tests.yml/badge.svg?branch=mb%2Fcustom_pad)](https://github.com/shimming-toolbox/susceptibility-to-fieldmap-fft/actions/workflows/run_tests.yml)
+[![Coverage Status](https://coveralls.io/repos/github/shimming-toolbox/susceptibility-to-fieldmap-fft/badge.svg?branch=mb/custom_pad)](https://coveralls.io/github/shimming-toolbox/susceptibility-to-fieldmap-fft?branch=mb/custom_pad)
+
 
 # Table of contents
 1. [Theory](#theory)
@@ -113,6 +116,8 @@ The `compute_fieldmap` command allows computation of a $B_0$ fieldmap based on a
 **Inputs** 
 - input_file : path to the susceptibility distribution (NIfTI file)
 - output_file : path for the fieldmap (NIfTI file)
+- -b, buffer (optional, default=50 voxels): Value-padding the edges of the volume
+- -m, method (optional, default=edge): Method used for value-padding, see np.pad options
 
 **Output** 
 The calculated fieldmap at the specified path.
