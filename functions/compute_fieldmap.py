@@ -45,11 +45,10 @@ def compute_bz_reference(susceptibility_distribution, image_resolution=np.array(
     """
     Reference implementation, kept verbatim as the numerical oracle.
 
-    This is the pre-refactor solver as of commit 5abb079. It builds the full
-    complex spectrum and a full-size kernel via meshgrid, so it is far too
-    memory-hungry for production volumes - but it is what minted the golden
-    fixtures in tests/fixtures/, and tests/functions/test_refactor_invariance.py
-    holds compute_bz to it.
+    This is the pre-refactor solver. It builds the full
+    complex spectrum and a full-size kernel via meshgrid, but 
+    consumes too much memory for full size human volumes at 1mm isotropic. 
+    It is retained as a reference for correctness and for tests.
 
     Compute the Bz field variation in ppm based on a susceptibility distribution
     using a Fourier-based method.
@@ -135,7 +134,7 @@ def fast_padded_shape(n, zerofill, real_axis=False):
     convolution and internally pads to a friendlier length. It still works, it
     just costs several times more.
 
-    Exact doubling walks straight into this: sub-amuPA's canvas is 547 voxels
+    Exact doubling walks straight into this: for example, consider a canvas of 547 voxels
     across, and 2 x 547 = 1094, whose only factors are 2 and the prime 547.
     Measured on a (1094, 300, 320) volume against (1100, 300, 320) - which is
     2^2 x 5^2 x 11, and 0.6% LARGER:
